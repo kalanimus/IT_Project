@@ -1,0 +1,13 @@
+D:\Учеба\IT_Proj\IT_Project\Database\DatabaseModels\bin\Debug\net9.0\DatabaseModels.deps.json
+D:\Учеба\IT_Proj\IT_Project\Database\DatabaseModels\bin\Debug\net9.0\DatabaseModels.dll
+D:\Учеба\IT_Proj\IT_Project\Database\DatabaseModels\bin\Debug\net9.0\DatabaseModels.pdb
+D:\Учеба\IT_Proj\IT_Project\Database\DatabaseModels\obj\Debug\net9.0\DatabaseModels.csproj.AssemblyReference.cache
+D:\Учеба\IT_Proj\IT_Project\Database\DatabaseModels\obj\Debug\net9.0\DatabaseModels.GeneratedMSBuildEditorConfig.editorconfig
+D:\Учеба\IT_Proj\IT_Project\Database\DatabaseModels\obj\Debug\net9.0\DatabaseModels.AssemblyInfoInputs.cache
+D:\Учеба\IT_Proj\IT_Project\Database\DatabaseModels\obj\Debug\net9.0\DatabaseModels.AssemblyInfo.cs
+D:\Учеба\IT_Proj\IT_Project\Database\DatabaseModels\obj\Debug\net9.0\DatabaseModels.csproj.CoreCompileInputs.cache
+D:\Учеба\IT_Proj\IT_Project\Database\DatabaseModels\obj\Debug\net9.0\DatabaseModels.sourcelink.json
+D:\Учеба\IT_Proj\IT_Project\Database\DatabaseModels\obj\Debug\net9.0\DatabaseModels.dll
+D:\Учеба\IT_Proj\IT_Project\Database\DatabaseModels\obj\Debug\net9.0\refint\DatabaseModels.dll
+D:\Учеба\IT_Proj\IT_Project\Database\DatabaseModels\obj\Debug\net9.0\DatabaseModels.pdb
+D:\Учеба\IT_Proj\IT_Project\Database\DatabaseModels\obj\Debug\net9.0\ref\DatabaseModels.dll
