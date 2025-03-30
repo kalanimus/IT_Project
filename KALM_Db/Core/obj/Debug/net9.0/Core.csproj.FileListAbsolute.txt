@@ -23,3 +23,16 @@ D:\Learning\IT_Proj\IT_Project\KALM_Db\Core\obj\Debug\net9.0\refint\Core.dll
 D:\Learning\IT_Proj\IT_Project\KALM_Db\Core\obj\Debug\net9.0\Core.pdb
 D:\Learning\IT_Proj\IT_Project\KALM_Db\Core\obj\Debug\net9.0\ref\Core.dll
 D:\Learning\IT_Proj\IT_Project\KALM_Db\Core\obj\Debug\net9.0\Core.csproj.AssemblyReference.cache
+D:\Learning\IT_Project\KALM_Db\Core\bin\Debug\net9.0\Core.deps.json
+D:\Learning\IT_Project\KALM_Db\Core\bin\Debug\net9.0\Core.dll
+D:\Learning\IT_Project\KALM_Db\Core\bin\Debug\net9.0\Core.pdb
+D:\Learning\IT_Project\KALM_Db\Core\obj\Debug\net9.0\Core.csproj.AssemblyReference.cache
+D:\Learning\IT_Project\KALM_Db\Core\obj\Debug\net9.0\Core.GeneratedMSBuildEditorConfig.editorconfig
+D:\Learning\IT_Project\KALM_Db\Core\obj\Debug\net9.0\Core.AssemblyInfoInputs.cache
+D:\Learning\IT_Project\KALM_Db\Core\obj\Debug\net9.0\Core.AssemblyInfo.cs
+D:\Learning\IT_Project\KALM_Db\Core\obj\Debug\net9.0\Core.csproj.CoreCompileInputs.cache
+D:\Learning\IT_Project\KALM_Db\Core\obj\Debug\net9.0\Core.sourcelink.json
+D:\Learning\IT_Project\KALM_Db\Core\obj\Debug\net9.0\Core.dll
+D:\Learning\IT_Project\KALM_Db\Core\obj\Debug\net9.0\refint\Core.dll
+D:\Learning\IT_Project\KALM_Db\Core\obj\Debug\net9.0\Core.pdb
+D:\Learning\IT_Project\KALM_Db\Core\obj\Debug\net9.0\ref\Core.dll

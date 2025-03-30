@@ -32,11 +32,14 @@ builder.Services.AddScoped<IGroupService, GroupService>(); // GroupService из 
 builder.Services.AddScoped<IPermissionService, PermissionService>(); // PermissionService из Application.Services
 builder.Services.AddScoped<IRoleService, RoleService>(); // RoleService из Application.Services
 builder.Services.AddScoped<ISubjectService, SubjectService>(); // SubjectService из Application.Services
+builder.Services.AddScoped<IUsernameGeneratorService, UsernameGeneratorService>();
+builder.Services.AddScoped<ITransliterationService, TransliterationService>();
 builder.Services.AddScoped<IScheduleService, ScheduleService>();
 builder.Services.AddScoped<IScheduleParser, ScheduleParser>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+builder.Services.AddTransient<Random>();
 
 // Регистрация AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile)); // Убедитесь, что у вас есть MappingProfile
