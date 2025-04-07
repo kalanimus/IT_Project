@@ -32,6 +32,89 @@
 - [ ] Реализовать алгоритмы обработки данных (DFD, IDEF0).  
 - [ ] Спроектировать API (OpenAPI-спецификация).  
 
+## ERD
+```mermaid
+erDiagram
+    PERMISSIONS ||--o{ PERMISSIONS_FOR_ROLES : "has"
+    ROLES ||--o{ PERMISSIONS_FOR_ROLES : "has"
+    ROLES ||--o{ USERS : "assigned to"
+    GROUPS ||--o{ GROUP_STUDENTS : "contains"
+    GROUPS ||--o{ GROUP_TEACHERS : "assigned to"
+    SUBJECTS ||--o{ GROUP_TEACHERS : "teaches"
+    USERS ||--o{ GROUP_STUDENTS : "is member"
+    USERS ||--o{ GROUP_TEACHERS : "teaches in"
+
+    PERMISSIONS {
+        integer Id PK "IDENTITY"
+        text PermissionName
+    }
+
+    ROLES {
+        integer Id PK "IDENTITY"
+        text Group_Name
+    }
+
+    PERMISSIONS_FOR_ROLES {
+        integer PermissionId FK
+        integer RoleId FK
+    }
+
+    SUBJECTS {
+        integer Id PK "IDENTITY"
+        text SubjectName
+    }
+
+    GROUP_STUDENTS {
+        integer GroupId FK
+        integer StudentId FK
+    }
+
+    USERS {
+        integer Id PK "IDENTITY"
+        text FullName
+        text Username
+        text PasswordHash
+        integer RoleId FK
+    }
+
+    GROUP_TEACHERS {
+        integer GroupId FK
+        integer TeacherId FK
+        integer SubjectId FK
+    }
+```
+
+## DFD возможных действий студента
+```mermaid
+flowchart TD
+    %% Внешняя сущность - Студент
+    Student[Студент] -->|Авторизуется| Auth(Система авторизации)
+    Student -->|Просматривает| Home[Главная страница]
+    Student -->|Оценивает| Rate(Система оценки)
+    Student -->|Оставляет отзыв| Review[Отзывы]
+    Student -->|Участвует| Survey(Опросы)
+    Student -->|Покупает| Shop[Магазин]
+    Student -->|Меняет данные| Profile(Профиль)
+
+    %% Процессы системы
+    Auth -->|Проверяет доступ| DB[(База данных пользователей)]
+    Home -->|Показывает| Notif[Уведомления]
+    Home -->|Показывает| Top[Топ активных]
+    Home -->|Показывает| LastComment[Последний комментарий]
+    
+    Rate -->|Сохраняет оценку| DB
+    Review -->|Проверка модератором| Moderation{Модерация}
+    Moderation -->|Одобренный отзыв| DB
+    Survey -->|Заполняет| DB
+    Shop -->|Списывает валюту| Currency[Внутренняя валюта]
+    Profile -->|Обновляет данные| DB
+
+    %% Потоки данных
+    Currency -->|Начисление за активность| Student
+    Currency -->|Ежедневный бонус| Student
+    DB -->|Предоставляет данные| Home
+```
+
 ---
 
 ## Лабораторная работа 3. Прототип приложения
