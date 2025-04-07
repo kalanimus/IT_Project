@@ -33,8 +33,7 @@
 - [ ] Спроектировать API (OpenAPI-спецификация).
 
 ## ER диаграмма
-```
-mermaid
+```mermaid
 erDiagram
     PERMISSIONS ||--o{ GROUPS : has
     PERMISSIONS {
