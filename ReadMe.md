@@ -30,7 +30,48 @@
 - [ ] Формализовать сущности БД (ERD-диаграмма).  
 - [x] Собрать данные через API (демонстрация работы).  
 - [ ] Реализовать алгоритмы обработки данных (DFD, IDEF0).  
-- [ ] Спроектировать API (OpenAPI-спецификация).  
+- [ ] Спроектировать API (OpenAPI-спецификация).
+
+## ER диаграмма
+```
+mermaid
+erDiagram
+    PERMISSIONS ||--o{ GROUPS : has
+    PERMISSIONS {
+        integer Id PK
+        text PermissionName
+    }
+    
+    GROUPS {
+        integer Id PK
+        text Group_Name
+    }
+    
+    ENTITY1 {
+        integer Id PK
+        text Subjective
+    }
+    
+    ENTITY2 {
+        integer Id PK
+        text Subjective
+    }
+    
+    ENTITY3 {
+        integer Id PK
+        text Subjective
+    }
+    
+    ENTITY4 {
+        integer Id PK
+        text Subjective
+    }
+    
+    ENTITY5 {
+        integer Id PK
+        text Subjective
+    }
+```
 
 ---
 
