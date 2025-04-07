@@ -35,40 +35,52 @@
 ## ER диаграмма
 ```mermaid
 erDiagram
-    PERMISSIONS ||--o{ GROUPS : has
+    PERMISSIONS ||--o{ PERMISSIONS_FOR_ROLES : "has"
+    ROLES ||--o{ PERMISSIONS_FOR_ROLES : "has"
+    ROLES ||--o{ USERS : "assigned to"
+    GROUPS ||--o{ GROUP_STUDENTS : "contains"
+    GROUPS ||--o{ GROUP_TEACHERS : "assigned to"
+    SUBJECTS ||--o{ GROUP_TEACHERS : "teaches"
+    USERS ||--o{ GROUP_STUDENTS : "is member"
+    USERS ||--o{ GROUP_TEACHERS : "teaches in"
+
     PERMISSIONS {
-        integer Id PK
+        integer Id PK "IDENTITY"
         text PermissionName
     }
-    
-    GROUPS {
-        integer Id PK
+
+    ROLES {
+        integer Id PK "IDENTITY"
         text Group_Name
     }
-    
-    ENTITY1 {
-        integer Id PK
-        text Subjective
+
+    PERMISSIONS_FOR_ROLES {
+        integer PermissionId FK
+        integer RoleId FK
     }
-    
-    ENTITY2 {
-        integer Id PK
-        text Subjective
+
+    SUBJECTS {
+        integer Id PK "IDENTITY"
+        text SubjectName
     }
-    
-    ENTITY3 {
-        integer Id PK
-        text Subjective
+
+    GROUP_STUDENTS {
+        integer GroupId FK
+        integer StudentId FK
     }
-    
-    ENTITY4 {
-        integer Id PK
-        text Subjective
+
+    USERS {
+        integer Id PK "IDENTITY"
+        text FullName
+        text Username
+        text PasswordHash
+        integer RoleId FK
     }
-    
-    ENTITY5 {
-        integer Id PK
-        text Subjective
+
+    GROUP_TEACHERS {
+        integer GroupId FK
+        integer TeacherId FK
+        integer SubjectId FK
     }
 ```
 
