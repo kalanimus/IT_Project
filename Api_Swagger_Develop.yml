@@ -1,0 +1,1401 @@
+openapi: 3.0.1
+info:
+  title: KALM API
+  description: API для системы оценки преподавателей с ролями, магазином, опросами и аналитикой.
+  version: 1.0.1
+servers:
+  - url: http://localhost:5113/api
+    description: Local development server
+
+tags:
+  - name: Auth
+    description: Регистрация, вход, смена пароля и логина
+  - name: Users
+    description: Управление пользователями и их профилями
+  - name: Surveys
+    description: Опросы для оценки преподавателей
+  - name: Analytics
+    description: Аналитика по оценкам и опросам
+  - name: Reviews
+    description: Отзывы о преподавателях
+  - name: Schedule
+    description: Расписание предметов
+
+components:
+  schemas:
+    # ===== Common Responses =====
+    SuccessResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Сообщение об успехе
+          example: "Операция выполнена успешно"
+        data:
+          type: object
+          description: Дополнительные данные ответа
+          nullable: true
+    
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Тип ошибки
+          example: "validation_error"
+        message:
+          type: string
+          description: Человекочитаемое сообщение
+          example: "Неверные входные данные"
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                description: Поле с ошибкой
+              message:
+                type: string
+                description: Сообщение об ошибке
+          nullable: true
+        statusCode:
+          type: integer
+          description: HTTP-статус код
+          example: 400
+        timestamp:
+          type: string
+          format: date-time
+          description: Время возникновения ошибки
+          example: "2025-04-02T12:00:00Z"
+      required: [error, message, statusCode, timestamp]
+
+    UnauthorizedErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Тип ошибки
+          example: "unauthorized"
+        message:
+          type: string
+          description: Человекочитаемое сообщение
+          example: "Неавторизованный доступ"
+        statusCode:
+          type: integer
+          description: HTTP-статус код
+          example: 401
+      required: [error, message, statusCode]
+
+    ServerErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Тип ошибки
+          example: "server_error"
+        message:
+          type: string
+          description: Человекочитаемое сообщение
+          example: "Ошибка сервера"
+        statusCode:
+          type: integer
+          description: HTTP-статус код
+          example: 500
+      required: [error, message, statusCode]
+
+    PermissionErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Тип ошибки
+          example: "Not enough permissions"
+        message:
+          type: string
+          description: Человекочитаемое сообщение
+          example: "Не достаточно прав"
+        statusCode:
+          type: integer
+          description: HTTP-статус код
+          example: 403
+      required: [error, message, statusCode]
+
+    # ==== Schedule ====
+    UploadScheduleRequest:
+      type: object
+      required:
+        - file
+      properties:
+        file:
+          type: string
+          format: binary
+          description: CSV файл для загрузки
+          example: "schedule.csv"
+
+    # ===== Auth =====
+    RegisterRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 30
+          pattern: '^[a-zA-Z0-9_]+$'
+          example: "student123"
+        password:
+          type: string
+          minLength: 6
+          maxLength: 100
+          example: "securePassword123"
+      required: [username, password]
+
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          example: "student123"
+        password:
+          type: string
+          example: "securePassword123"
+      required: [username, password]
+
+    AuthResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        user:
+          $ref: "#/components/schemas/User"
+
+    # ===== Users =====
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          minimum: 0
+          example: "10"
+        username:
+          type: string
+          example: "student123"
+        fullName:
+          type: string
+          nullable: true
+          example: "Иванов И.И."
+        role:
+          type: string
+          example: "Студент"
+        balance:
+          type: integer
+          minimum: 0
+          example: 100
+        avatar:
+          type: string
+          nullable: true
+          example: "https://example.com/avatar.jpg"
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 30
+          pattern: '^[a-zA-Z0-9_]+$'
+          example: "new_username"
+        fullName:
+          type: string
+          nullable: true
+          example: "Петров П.П."
+        avatar:
+          type: string
+          nullable: true
+          example: "https://example.com/new_avatar.jpg"
+        balance:
+          type: integer
+          nullable: true
+          example: 100
+
+    CreateUserRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          example: "new_user"
+        fullName:
+          type: string
+          example: "Иванов И.И."
+        role:
+          type: string
+          example: "student"
+      required: [username, role]
+
+    # ===== Surveys =====
+    Survey:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 10
+        title:
+          type: string
+          example: "Оценка преподавания весна 2025"
+        description:
+          type: string
+          nullable: true
+          example: "Анкета для оценки преподавателей"
+        questions:
+          type: array
+          items:
+            oneOf:  # Варианты вопросов
+            - type: object
+              properties:
+                type:
+                  type: string
+                  enum: ["multiple_choice"]
+                text:
+                  type: string
+                  example: "Как вы думаете...?"
+                options:
+                  type: array
+                  items:
+                    type: string
+                  example: ["1", "2", "3"]
+              required: [type, text, options]
+            - type: object
+              properties:
+                type:
+                  type: string
+                  enum: ["text"]
+                text:
+                  type: string
+                  example: "Оставьте отзыв"
+              required: [type, text]
+        isMandatory:
+          type: boolean
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-04-02T12:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2025-04-02T12:00:00Z"
+        createdBy:
+          type: integer
+          example: 10
+
+    CreateSurveyRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 3
+          maxLength: 100
+          example: "Новый опрос"
+        description:
+          type: string
+          nullable: true
+          example: "Описание опроса"
+        questions:
+          type: array
+          items:
+            oneOf:  # Варианты вопросов
+            - type: object
+              properties:
+                type:
+                  type: string
+                  enum: ["multiple_choice"]
+                text:
+                  type: string
+                  example: "Как вы думаете...?"
+                options:
+                  type: array
+                  items:
+                    type: string
+                  example: ["1", "2", "3"]
+              required: [type, text, options]
+            - type: object
+              properties:
+                type:
+                  type: string
+                  enum: ["text"]
+                text:
+                  type: string
+                  example: "Оставьте отзыв"
+              required: [type, text]
+        isMandatory:
+          type: boolean
+          default: false
+          example: false
+      required: [title]
+
+    UpdateSurveyRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 3
+          maxLength: 100
+          example: "Обновленный опрос"
+        description:
+          type: string
+          nullable: true
+          example: "Обновленное описание"
+        questions:
+          type: array
+          items:
+            oneOf:  # Варианты вопросов
+            - type: object
+              properties:
+                type:
+                  type: string
+                  enum: ["multiple_choice"]
+                text:
+                  type: string
+                  example: "Как вы думаете...?"
+                options:
+                  type: array
+                  items:
+                    type: string
+                  example: ["1", "2", "3"]
+              required: [type, text, options]
+            - type: object
+              properties:
+                type:
+                  type: string
+                  enum: ["text"]
+                text:
+                  type: string
+                  example: "Оставьте отзыв"
+              required: [type, text]
+        isMandatory:
+          type: boolean
+          example: true
+
+    SurveySubmission:
+      type: object
+      properties:
+        answers:
+          type: array
+          items:
+            type: object
+            properties:
+              questionId:
+                type: string
+                format: uuid
+                example: "507f1f77bcf86cd799439013"
+              value:
+                type: string
+                example: "5"
+
+    # ===== Analytics =====
+    TeacherAnalytics:
+      type: object
+      properties:
+        teacherId:
+          type: integer
+          example: 10
+        averageRating:
+          type: number
+          minimum: 1
+          maximum: 5
+          example: 4.5
+        totalResponses:
+          type: integer
+          minimum: 0
+          example: 42
+        subjects:
+          type: array
+          items:
+            type: object
+            properties:
+              subjectId:
+                type: string
+                format: uuid
+              subjectName:
+                type: string
+              averageRating:
+                type: number
+
+    ServeyAnalytics:
+      type: object
+      properties:
+        serveyId:
+          type: integer
+          example: 10
+        totalResponses:
+          type: integer
+          minimum: 0
+          example: 42
+        specifications:
+          type: array
+          items:
+            type: object
+            properties:
+              specificationsName:
+                type: string
+              averageRating:
+                type: number
+
+    # ===== Reviews =====
+    Review:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 10
+        authorId:
+          type: integer
+          example: 20
+        teacherId:
+          type: integer
+          example: 30
+        text:
+          type: string
+          maxLength: 1000
+          example: "Отличный преподаватель!"
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+          example: "approved"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-04-02T12:00:00Z"
+
+    CreateReviewRequest:
+      type: object
+      properties:
+        teacherId:
+          type: integer
+          example: 30
+        text:
+          type: string
+          maxLength: 1000
+          example: "Отличный преподаватель!"
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          example: 4
+      required: [teacherId, text, rating]
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+paths:
+  # ==================== Auth ====================
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Регистрация нового пользователя
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        201:
+          description: Успешная регистрация
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        400:
+          description: |
+            Неверные данные:
+            - Пользователя не существует
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                invalidUsername:
+                  value:
+                    error: "user_do_not_exists"
+                    message: "Пользователя не существует"
+                    statusCode: 400
+                    details:
+                      - field: "username"
+                        message: "Такого пользователя не существует"
+        500:
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Вход в систему
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        200:
+          description: Успешный вход
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        401:
+          description: Неверные учетные данные
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                invalidUserData:
+                  value:
+                    error: "invalid_user_data"
+                    message: "Неверные данные пользователя"
+                    statusCode: 401
+              
+        500:
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+                
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Получить данные текущего пользователя
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        401:
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponse"
+        500:
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+
+  # ==================== Users (CRUD) ====================
+  /users:
+    get:
+      tags: [Users]
+      summary: Список всех пользователей
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/User"
+                  total:
+                    type: integer
+                    example: 100
+        401:
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponse"   
+        500:
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+
+    post:
+      tags: [Users]
+      summary: Создать нового пользователя (только для администраторов)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserRequest"
+      responses:
+        201:
+          description: Пользователь создан
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        401:
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponse"
+        403:
+          description: Недостаточно прав
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PermissionErrorResponse"
+        409:
+          description: Пользователь с таким именем уже существует
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                invalidUserData:
+                  value:
+                    error: "user with this name is aready exists"
+                    message: "Пользователь с таким именем уже существует"
+                    statusCode: 409
+        500:
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+
+  /users/upload-students-csv:
+    post:
+      tags: [Users]
+      summary: Загрузить CSV файл с пользователями (только для администраторов)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UploadScheduleRequest'
+      responses:
+        200:
+          description: Файл успешно обработан
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+              examples:
+                successExample:
+                  value:
+                    message: "Успешно создано 42 пользователя"
+        400:
+          description: Неверный формат файла
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                invalidFileFormat:
+                  value:
+                    error: "invalid_file_format"
+                    message: "Неверный формат файла"
+                    statusCode: 400
+        401:
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponse"
+        403:
+          description: Недостаточно прав
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PermissionErrorResponse"
+        500:
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+
+  /users/{id}:
+    get:
+      tags: [Users]
+      summary: Получить пользователя по ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"          
+        401:
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponse"
+        404:
+          description: Пользователь не найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                userDoNotExists:
+                  value:
+                    error: "user_do_not_exists"
+                    message: "Пользователя не существует"
+                    statusCode: 404
+        500:
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+
+    patch:
+      tags: [Users]
+      summary: Обновить данные пользователя
+      description: |
+        Пользователь может обновить только свои данные, администратор - любые
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRequest"
+      responses:
+        200:
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"          
+        401:
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponse"
+        403:
+          description: Недостаточно прав для изменения этого пользователя
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PermissionErrorResponse"
+        404:
+          description: Пользователь не найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                userDoNotExists:
+                  value:
+                    error: "user_do_not_exists"
+                    message: "Пользователя не существует"
+                    statusCode: 404
+        500:
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+
+    delete:
+      tags: [Users]
+      summary: Удалить пользователя (только для администраторов)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        204:
+          description: Пользователь успешно удалён
+        400:
+          description: Неверный ID пользователя
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                invalidId:
+                  value:
+                    error: "invalid_id"
+                    message: "Неверный ID пользователя"
+                    statusCode: 400
+        401:
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponse"
+        403:
+          description: Недостаточно прав
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PermissionErrorResponse"
+        404:
+          description: Пользователь не найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                userDoNotExists:
+                  value:
+                    error: "user_do_not_exists"
+                    message: "Пользователя не существует"
+                    statusCode: 404
+        500:
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+
+  # ==================== Schedule ====================
+  /schedule/upload-csv:
+    post:
+      tags: [Schedule]
+      summary: Загрузить CSV файл с расписанием (только для администраторов)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UploadScheduleRequest'
+      responses:
+        200:
+          description: Файл успешно обработан
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+              examples:
+                successExample:
+                  value:
+                    message: "Расписание успешно обновлено"
+        400:
+          description: Неверный формат файла
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                invalidFileFormat:
+                  value:
+                    error: "invalid_file_format"
+                    message: "Неверный формат файла"
+                    statusCode: 400
+        401:
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponse"
+        403:
+          description: Недостаточно прав
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PermissionErrorResponse"
+        500:
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+
+  # ==================== Surveys (CRUD) ====================
+  /surveys:
+    get:
+      tags: [Surveys]
+      summary: Список доступных опросов
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: teacherId
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+          description: Id учителя
+      responses:
+        200:
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  surveys:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Survey"
+                  total:
+                    type: integer
+                    example: 100
+        401:
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponse"
+        500:
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+
+    post:
+      tags: [Surveys]
+      summary: Создать новый опрос (только для преподавателей и администраторов)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSurveyRequest"
+      responses:
+        201:
+          description: Опрос успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Survey"
+        401:
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponse"
+        403:
+          description: Недостаточно прав
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PermissionErrorResponse"
+        500:
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+
+  /surveys/{id}:
+    get:
+      tags: [Surveys]
+      summary: Получить опрос по ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Survey"
+        400:
+          description: Неверный ID опроса
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                invalidId:
+                  value:
+                    error: "Invalid survey id"
+                    message: "Неверный ID опроса"
+                    statusCode: 400
+        401:
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponse"
+        404:
+          description: Опрос не найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                serveyDoNotExists:
+                  value:
+                   error: "Survey not found"
+                   message: "Опрос не найден"
+                   statusCode: 404
+        500:
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+
+    put:
+      tags: [Surveys]
+      summary: Обновить опрос (только автор или администратор)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSurveyRequest"
+      responses:
+        200:
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Survey"
+        401:
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponse"
+        403:
+          description: Недостаточно прав
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PermissionErrorResponse"
+        404:
+          description: Опрос не найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                serveyDoNotExists:
+                  value:
+                   error: "Survey not found"
+                   message: "Опрос не найден"
+                   statusCode: 404
+        500:
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+
+    delete:
+      tags: [Surveys]
+      summary: Удалить опрос (только автор или администратор)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Опрос успешно удалён
+        401:
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponse"
+        403:
+          description: Недостаточно прав
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PermissionErrorResponse"
+        404:
+          description: Опрос не найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                serveyDoNotExists:
+                  value:
+                   error: "Survey not found"
+                   message: "Опрос не найден"
+                   statusCode: 404
+        500:
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+
+  # ==================== Analytics ====================
+  /analytics/teachers/{id}:
+    get:
+      tags: [Analytics]
+      summary: Аналитика по преподавателю
+      description: Доступно преподавателю, декану, ректору и администратору
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [week, month, semester, year, all]
+            default: "semester"
+          description: Период для анализа
+      responses:
+        200:
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeacherAnalytics"
+        401:
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponse"
+        403:
+          description: Недостаточно прав
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PermissionErrorResponse"
+        404:
+          description: Преподаватель не найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                teacherDoNotExists:
+                  value:
+                   error: "Teacher not found"
+                   message: "Преподаватель не найден"
+                   statusCode: 404
+        500:
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+
+  /analytics/servey/{id}:
+    get:
+      tags: [Analytics]
+      summary: Аналитика по опросу
+      description: Доступно преподавателю, декану, ректору и администратору
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [week, month, semester, year, all]
+            default: "semester"
+          description: Период для анализа
+      responses:
+        200:
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServeyAnalytics"
+        401:
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponse"
+        403:
+          description: Недостаточно прав
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PermissionErrorResponse"
+        404:
+          description: Опрос не найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                teacherDoNotExists:
+                  value:
+                   error: "Survey not found"
+                   message: "Опрос не найден"
+                   statusCode: 404
+        500:
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+
+  # ==================== Reviews ====================
+  /reviews/teacher/{id}:
+    get:
+      tags: [Reviews]
+      summary: Список отзывов о преподавателе
+      description: Возвращает только одобренные отзывы
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reviews:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Review"
+                  total:
+                    type: integer
+                    example: 100
+                  averageRating:
+                    type: number
+                    example: 4.5
+        401:
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponse"
+        404:
+          description: Преподаватель не найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                teacherDoNotExists:
+                  value:
+                   error: "Teacher not found"
+                   message: "Преподаватель не найден"
+                   statusCode: 404
+        500:
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+
+  /reviews/create:
+    post:
+      tags: [Reviews]
+      summary: Создать отзыв о преподавателе
+      description: |
+        Создает отзыв и списывает валюту.
+        Отзыв будет ожидать модерации.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReviewRequest"
+      responses:
+        201:
+          description: Отзыв создан и ожидает модерации
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+        401:
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponse"
+        500:
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
