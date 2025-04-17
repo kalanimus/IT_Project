@@ -7,6 +7,7 @@ using AutoMapper;
 
 namespace API.Controllers
 {
+
     [ApiController]
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
@@ -26,6 +27,11 @@ namespace API.Controllers
         }
 
         // POST: api/auth/login
+        /// <summary>
+        /// Аутентификация пользователя
+        /// </summary>
+        /// <param name="request">Логин и пароль</param>
+        /// <returns>JWT-токен</returns>
         [HttpPost("login")]
         public async Task<ActionResult<AuthResponseDto>> Login([FromBody] LoginRequestDto request)
         {

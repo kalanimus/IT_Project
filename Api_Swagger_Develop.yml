@@ -12,10 +12,10 @@ tags:
     description: Регистрация, вход, смена пароля и логина
   - name: Users
     description: Управление пользователями и их профилями
+  - name: Teachers
+    description: Управление учителями и их оценками
   - name: Surveys
     description: Опросы для оценки преподавателей
-  - name: Analytics
-    description: Аналитика по оценкам и опросам
   - name: Reviews
     description: Отзывы о преподавателях
   - name: Schedule
@@ -377,7 +377,7 @@ components:
           type: boolean
           example: true
 
-    SurveySubmission:
+    CompleteSurveyRequest:
       type: object
       properties:
         answers:
@@ -386,13 +386,74 @@ components:
             type: object
             properties:
               questionId:
-                type: string
-                format: uuid
-                example: "507f1f77bcf86cd799439013"
+                type: integer
+                example: 10
               value:
                 type: string
-                example: "5"
+                example: "2" # Для multiple_choice
+              textAnswer:
+                type: string
+                nullable: true
+                example: "Текст ответа" # Для text вопросов
+            oneOf:
+              - required: [questionId, value] # Для вопросов с выбором
+              - required: [questionId, textAnswer] # Для текстовых вопросов
+          minItems: 1
+          description: Ответы на вопросы опроса
+      required: [answers]
 
+    SurveyCompletionResponse:
+      type: object
+      properties:
+        surveyId:
+          type: integer
+          example: 10
+        completedAt:
+          type: string
+          format: date-time
+          example: "2025-04-15T14:30:00Z"
+        answersCount:
+          type: integer
+          example: 5
+          description: Количество сохраненных ответов
+
+    SurveySubmission:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        surveyId:
+          type: integer
+          example: 10
+        userId:
+          type: integer
+          example: 123
+        answers:
+          type: array
+          items:
+            $ref: "#/components/schemas/SurveyAnswer"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-04-15T14:30:00Z"
+
+    SurveyAnswer:
+      type: object
+      properties:
+        questionId:
+          type: string
+          format: uuid
+          example: "507f1f77bcf86cd799439013"
+        value:
+          type: string
+          nullable: true
+          example: "2"
+        textAnswer:
+          type: string
+          nullable: true
+          example: "Текст ответа"
     # ===== Analytics =====
     TeacherAnalytics:
       type: object
@@ -449,9 +510,6 @@ components:
         id:
           type: integer
           example: 10
-        authorId:
-          type: integer
-          example: 20
         teacherId:
           type: integer
           example: 30
@@ -485,6 +543,90 @@ components:
           example: 4
       required: [teacherId, text, rating]
 
+    PendingReview:
+      allOf:
+        - $ref: "#/components/schemas/Review"
+        - type: object
+          properties:
+            status:
+              type: string
+              enum: [pending]
+              example: "pending"
+            createdAt:
+              type: string
+              format: date-time
+              example: "2025-04-15T10:30:00Z"
+            authorId:
+              type: integer
+              example: 123
+            currencySpent:
+              type: integer
+              example: 100
+              description: Сколько валюты потратил пользователь на этот отзыв
+
+  # ======== Currency =========
+    UserCurrencyBalance:
+      type: object
+      properties:
+        balance:
+          type: integer
+          example: 1500
+          description: Текущий баланс валюты
+        lastDailyBonus:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2025-04-14T09:30:00Z"
+        nextDailyBonusAvailable:
+          type: boolean
+          example: true
+
+    CurrencyOperationResult:
+      type: object
+      properties:
+        newBalance:
+          type: integer
+          example: 1600
+        amountReceived:
+          type: integer
+          example: 100
+        operationType:
+          type: string
+          enum: [daily_bonus, survey_reward, activity_bonus]
+          example: "survey_reward"
+
+    CurrencyHistoryResponse:
+      type: object
+      properties:
+        history:
+          type: array
+          items:
+            $ref: "#/components/schemas/CurrencyHistoryItem"
+        total:
+          type: integer
+          example: 25
+
+    CurrencyHistoryItem:
+      type: object
+      properties:
+        amount:
+          type: integer
+          example: 100
+        type:
+          type: string
+          enum: [daily_bonus, survey_reward, activity_bonus, purchase]
+          example: "survey_reward"
+        date:
+          type: string
+          format: date-time
+          example: "2025-04-14T09:30:00Z"
+        description:
+          type: string
+          example: "Награда за прохождение опроса 'Оценка преподавания'"
+        surveyId:
+          type: integer
+          nullable: true
+          example: 10
   securitySchemes:
     bearerAuth:
       type: http
@@ -682,7 +824,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ServerErrorResponse"
 
-  /users/upload-students-csv:
+  /users/csv:
     post:
       tags: [Users]
       summary: Загрузить CSV файл с пользователями (только для администраторов)
@@ -897,8 +1039,52 @@ paths:
               schema:
                 $ref: "#/components/schemas/ServerErrorResponse"
 
+  # ==================== User Currency System ====================
+  /users/me/balance:
+    get:
+      tags: [Users]
+      summary: Получить текущий баланс валюты
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Текущий баланс
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserCurrencyBalance"
+        401:
+          $ref: "#/components/schemas/UnauthorizedErrorResponse"
+
+  /users/currency/daily-bonus:
+    post:
+      tags: [Users]
+      summary: Получить ежедневный бонус
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Бонус успешно начислен
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CurrencyOperationResult"
+        400:
+          description: Бонус уже получен сегодня
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                value:
+                  error: "Daily bonus already claimed"
+                  message: "Ежедневный бонус уже получен"
+                  statusCode: 400
+        401:
+          $ref: "#/components/schemas/UnauthorizedErrorResponse"
+
   # ==================== Schedule ====================
-  /schedule/upload-csv:
+  /schedule/csv:
     post:
       tags: [Schedule]
       summary: Загрузить CSV файл с расписанием (только для администраторов)
@@ -1189,69 +1375,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/ServerErrorResponse"
 
-  # ==================== Analytics ====================
-  /analytics/teachers/{id}:
+  /survey/analytics/{id}:
     get:
-      tags: [Analytics]
-      summary: Аналитика по преподавателю
-      description: Доступно преподавателю, декану, ректору и администратору
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: period
-          in: query
-          schema:
-            type: string
-            enum: [week, month, semester, year, all]
-            default: "semester"
-          description: Период для анализа
-      responses:
-        200:
-          description: Успешно
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/TeacherAnalytics"
-        401:
-          description: Неавторизованный доступ
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UnauthorizedErrorResponse"
-        403:
-          description: Недостаточно прав
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PermissionErrorResponse"
-        404:
-          description: Преподаватель не найден
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              example:
-                teacherDoNotExists:
-                  value:
-                   error: "Teacher not found"
-                   message: "Преподаватель не найден"
-                   statusCode: 404
-        500:
-          description: Внутренняя ошибка сервера
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ServerErrorResponse"
-
-  /analytics/servey/{id}:
-    get:
-      tags: [Analytics]
+      tags: [Surveys]
       summary: Аналитика по опросу
       description: Доступно преподавателю, декану, ректору и администратору
       security:
@@ -1308,10 +1434,11 @@ paths:
               schema:
                 $ref: "#/components/schemas/ServerErrorResponse"
 
-  # ==================== Reviews ====================
-  /reviews/teacher/{id}:
+  
+  # ==================== Teachers ====================
+  /teachers/{id}/reviews:
     get:
-      tags: [Reviews]
+      tags: [Teachers]
       summary: Список отзывов о преподавателе
       description: Возвращает только одобренные отзывы
       security:
@@ -1365,21 +1492,21 @@ paths:
               schema:
                 $ref: "#/components/schemas/ServerErrorResponse"
 
-  /reviews/create:
+  /teachers/{id}/reviews/:
     post:
-      tags: [Reviews]
+      tags: [Teachers]
       summary: Создать отзыв о преподавателе
       description: |
         Создает отзыв и списывает валюту.
         Отзыв будет ожидать модерации.
       security:
         - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateReviewRequest"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         201:
           description: Отзыв создан и ожидает модерации
@@ -1399,3 +1526,220 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerErrorResponse"
+    
+  /teachers/analytics/{id}:
+    get:
+      tags: [Teachers]
+      summary: Аналитика по преподавателю
+      description: Доступно преподавателю, декану, ректору и администратору
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [week, month, semester, year, all]
+            default: "semester"
+          description: Период для анализа
+      responses:
+        200:
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeacherAnalytics"
+        401:
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponse"
+        403:
+          description: Недостаточно прав
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PermissionErrorResponse"
+        404:
+          description: Преподаватель не найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                teacherDoNotExists:
+                  value:
+                   error: "Teacher not found"
+                   message: "Преподаватель не найден"
+                   statusCode: 404
+        500:
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+  
+  # ==================== Survey Completion ====================
+  /surveys/{id}/complete:
+    post:
+      tags: [Surveys]
+      summary: Пройти опрос (для студентов)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompleteSurveyRequest"
+      responses:
+        200:
+          description: Опрос успешно пройден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SurveyCompletionResponse"
+        400:
+          description: Неверные данные ответов
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        401:
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedErrorResponse"
+        403:
+          description: Недостаточно прав (например, преподаватель пытается пройти опрос)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PermissionErrorResponse"
+        404:
+          description: Опрос не найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+
+      # ==================== Reviews Moderation ====================
+  /reviews/pending:
+    get:
+      tags: [Reviews]
+      summary: Список отзывов на модерации (только для модераторов/админов)
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Список отзывов на модерации
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reviews:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PendingReview"
+                  total:
+                    type: integer
+                    example: 15
+        401:
+          $ref: "#/components/schemas/UnauthorizedErrorResponse"
+        403:
+          $ref: "#/components/schemas/PermissionErrorResponse"
+
+  /reviews/{id}:
+    patch:
+      tags: [Reviews]
+      summary: Одобрить отзыв (только для модераторов/админов)
+      description: |
+        Одобряет отзыв и начисляет бонус автору (если предусмотрено)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                state: 
+                  type: boolean
+                bonusAmount:
+                  type: integer
+                  minimum: 0
+                  example: 50
+                  description: Дополнительный бонус за качественный отзыв
+      responses:
+        200:
+          description: Отзыв одобрен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  review:
+                    $ref: "#/components/schemas/Review"
+                  currencyBonus:
+                    type: integer
+                    example: 50
+                    description: Начисленный бонус автору
+        400:
+          description: Отзыв уже был обработан
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                value:
+                  error: "Review already processed"
+                  message: "Этот отзыв уже был обработан"
+                  statusCode: 400
+        401:
+          $ref: "#/components/schemas/UnauthorizedErrorResponse"
+        403:
+          $ref: "#/components/schemas/PermissionErrorResponse"
+        404:
+          description: Опрос не найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                serveyDoNotExists:
+                  value:
+                   error: "Survey not found"
+                   message: "Опрос не найден"
+                   statusCode: 404
+        500:
+          $ref: "#/components/schemas/ServerErrorResponse"
+          

@@ -434,3 +434,8 @@ D:\Learning\IT_Project\KALM_Db\API\obj\Debug\net9.0\staticwebassets.pack.json
 D:\Learning\IT_Project\KALM_Db\API\obj\Debug\net9.0\API.csproj.Up2Date
 D:\Learning\IT_Project\KALM_Db\API\obj\Debug\net9.0\API.genruntimeconfig.cache
 D:\Learning\IT_Project\KALM_Db\API\obj\Debug\net9.0\ref\API.dll
+D:\Learning\IT_Proj\IT_Project\KALM_Db\API\bin\Debug\net9.0\Swashbuckle.AspNetCore.Swagger.dll
+D:\Learning\IT_Proj\IT_Project\KALM_Db\API\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+D:\Learning\IT_Proj\IT_Project\KALM_Db\API\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+D:\Learning\IT_Proj\IT_Project\KALM_Db\API\bin\Debug\net9.0\API.xml
+D:\Learning\IT_Proj\IT_Project\KALM_Db\API\obj\Debug\net9.0\API.xml
