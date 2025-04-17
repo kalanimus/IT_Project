@@ -35,7 +35,7 @@ namespace API.Controllers
 
         // GET: api/users
         [HttpGet]
-        public async Task<ActionResult<UserDto>> GetAllUsers(int id)
+        public async Task<ActionResult<UserDto>> GetAllUsers()
         {
             var users = await _userService.GetAllAsync();
             if (users == null) return NotFound();
@@ -45,6 +45,7 @@ namespace API.Controllers
         }
 
         // POST: api/users
+        [Authorize(Policy = "AdminOnly")]
         [HttpPost]
         public async Task<ActionResult<UserDto>> CreateUser(UserDto userDto)
         {
@@ -68,10 +69,20 @@ namespace API.Controllers
         }
 
         // DELETE: api/users/{id}
+        [Authorize(Policy = "AdminOnly")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
             await _userService.DeleteAsync(id);
+            return NoContent();
+        }
+
+        // POST: api/users/csv
+        [Authorize(Policy = "AdminOnly")]
+        [HttpPost("scv")]
+        public async Task<IActionResult> UploadStudents(IFormFile file)
+        {
+            // await _userService.DeleteAsync(id);
             return NoContent();
         }
     }

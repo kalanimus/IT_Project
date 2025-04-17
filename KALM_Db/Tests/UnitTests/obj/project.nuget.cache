@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "idP491HA3tU=",
+  "dgSpecHash": "2Szb+bN0iZk=",
   "success": true,
-  "projectFilePath": "D:\\Learning\\IT_Proj\\IT_Project\\KALM_Db\\Tests\\UnitTests\\UnitTests.csproj",
+  "projectFilePath": "D:\\Learning\\IT_Project\\KALM_Db\\Tests\\UnitTests\\UnitTests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\nikit\\.nuget\\packages\\automapper\\14.0.0\\automapper.14.0.0.nupkg.sha512",
     "C:\\Users\\nikit\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",

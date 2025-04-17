@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "GxrWK1EmzLM=",
+  "dgSpecHash": "tR9p+0ZfIK4=",
   "success": true,
-  "projectFilePath": "D:\\Learning\\IT_Proj\\IT_Project\\KALM_Db\\Core\\Core.csproj",
+  "projectFilePath": "D:\\Learning\\IT_Project\\KALM_Db\\Core\\Core.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\nikit\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512"
   ],

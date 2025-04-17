@@ -63,11 +63,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
         };
     });
-    
-    builder.Services.AddAuthorization(options =>
+
+builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AdminOnly", policy => 
-        policy.RequireRole("Админстратор"));
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireRole("Администратор"));
 });
 
 builder.Services.AddAuthorization();
@@ -75,9 +75,9 @@ builder.Services.AddAuthorization();
 // === Добавление Swagger ===
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo 
-    { 
-        Title = "Schedule API", 
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Schedule API",
         Version = "v1",
         Description = "API для управления расписанием и аутентификации",
     });
@@ -114,12 +114,12 @@ builder.Services.AddSwaggerGen(c =>
     });
 
     // XML-документация (если включена в .csproj)
-    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    if (File.Exists(xmlPath))
-    {
-        c.IncludeXmlComments(xmlPath);
-    }
+    // var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    // var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    // if (File.Exists(xmlPath))
+    // {
+    //     c.IncludeXmlComments(xmlPath);
+    // }
 });
 
 var app = builder.Build();

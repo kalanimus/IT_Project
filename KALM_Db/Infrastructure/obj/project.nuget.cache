@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Y5YQzP8WOzc=",
+  "dgSpecHash": "jhYBhNdJ+KQ=",
   "success": true,
-  "projectFilePath": "D:\\Learning\\IT_Proj\\IT_Project\\KALM_Db\\Infrastructure\\Infrastructure.csproj",
+  "projectFilePath": "D:\\Learning\\IT_Project\\KALM_Db\\Infrastructure\\Infrastructure.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\nikit\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
     "C:\\Users\\nikit\\.nuget\\packages\\csvhelper\\33.0.1\\csvhelper.33.0.1.nupkg.sha512",

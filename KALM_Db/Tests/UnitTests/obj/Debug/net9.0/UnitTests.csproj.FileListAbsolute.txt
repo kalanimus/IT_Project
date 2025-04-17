@@ -280,3 +280,7 @@ D:\Learning\IT_Project\KALM_Db\Tests\UnitTests\obj\Debug\net9.0\UnitTests.source
 D:\Learning\IT_Project\KALM_Db\Tests\UnitTests\obj\Debug\net9.0\UnitTests.csproj.Up2Date
 D:\Learning\IT_Project\KALM_Db\Tests\UnitTests\obj\Debug\net9.0\UnitTests.genruntimeconfig.cache
 D:\Learning\IT_Project\KALM_Db\Tests\UnitTests\obj\Debug\net9.0\ref\UnitTests.dll
+D:\Learning\IT_Project\KALM_Db\Tests\UnitTests\bin\Debug\net9.0\Swashbuckle.AspNetCore.Swagger.dll
+D:\Learning\IT_Project\KALM_Db\Tests\UnitTests\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+D:\Learning\IT_Project\KALM_Db\Tests\UnitTests\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+D:\Learning\IT_Project\KALM_Db\Tests\UnitTests\bin\Debug\net9.0\API.xml
