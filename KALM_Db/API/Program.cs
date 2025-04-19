@@ -24,6 +24,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 builder.Services.AddScoped<IGroupTeacherRepository, GroupTeacherRepository>();
+builder.Services.AddScoped<IGroupStudentRepository, GroupStudentRepository>();
 builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
@@ -38,9 +39,11 @@ builder.Services.AddScoped<IUsernameGeneratorService, UsernameGeneratorService>(
 builder.Services.AddScoped<ITransliterationService, TransliterationService>();
 builder.Services.AddScoped<IScheduleService, ScheduleService>();
 builder.Services.AddScoped<IScheduleParser, ScheduleParser>();
+builder.Services.AddScoped<IStudentsParser, StudentsParser>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+builder.Services.AddScoped<IEmailSenderService, EmailSenderService>();
 builder.Services.AddTransient<Random>();
 
 // Регистрация AutoMapper

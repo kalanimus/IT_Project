@@ -2,5 +2,6 @@ namespace Core.Interfaces;
 
 public interface IUsernameGeneratorService
 {
-  public string Generate(string fullName);
+  string GenerateTeacherUsername(string fullName);
+  string GenerateStudentUsername(string fullName, string CCNumber);
 }

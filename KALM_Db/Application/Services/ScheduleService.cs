@@ -51,8 +51,8 @@ public class ScheduleService : IScheduleService
                 var teacher = await _userRepository.GetByFullNameAsync(item.Teacher.FullName);
                 if (teacher == null)
                 {
-                    var username = _usernameGeneratorService.Generate(item.Teacher.FullName);
-                    teacher = new ModelUser { FullName = item.Teacher.FullName, Username = username, RoleId = 4 };
+                    var username = _usernameGeneratorService.GenerateTeacherUsername(item.Teacher.FullName);
+                    teacher = new ModelUser { FullName = item.Teacher.FullName, Username = username, RoleId = 4, Balance = 0 };
                 }
 
                 // 3. Работа с предметом

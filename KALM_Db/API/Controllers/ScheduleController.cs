@@ -22,7 +22,7 @@ namespace API.Controllers
             _mapper = mapper;
         }
 
-        [HttpPost("upload-csv")]
+        [HttpPost("csv")]
         public async Task<IActionResult> UploadScheduleCsv(IFormFile file)
         {
             if (file == null || file.Length == 0)

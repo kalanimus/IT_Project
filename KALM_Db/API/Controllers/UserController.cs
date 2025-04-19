@@ -79,11 +79,24 @@ namespace API.Controllers
 
         // POST: api/users/csv
         [Authorize(Policy = "AdminOnly")]
-        [HttpPost("scv")]
+        [HttpPost("csv")]
         public async Task<IActionResult> UploadStudents(IFormFile file)
         {
-            // await _userService.DeleteAsync(id);
-            return NoContent();
+            if (file == null || file.Length == 0)
+                return BadRequest("Файл не был загружен");
+
+            if (!Path.GetExtension(file.FileName).Equals(".csv", StringComparison.OrdinalIgnoreCase))
+                return BadRequest("Поддерживаются только CSV-файлы");
+            await using var stream = file.OpenReadStream(); // Преобразование IFormFile в Stream
+            try
+            {
+                await _userService.UploadStudentsAsync(stream);
+                return Ok("Файл успешно обработан");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ошибка обработки файла: {ex.Message}");
+            }
         }
     }
 }

@@ -50,11 +50,30 @@ namespace API.Controllers
         public async Task<ActionResult<AuthResponseDto>> Register([FromBody] RegisterRequestDto request)
         {
             var token = await _authService.RegisterAsync(request.Username, request.Password);
-            
+            if (token == null){
+                return Ok(new AuthResponseDto{
+                    Message = $"Письмо с подтверждением отправлено на почту! ({request.Username}@student.bmstu.ru)",
+                    RequireVerification = true
+                });
+            }
             return Ok(new AuthResponseDto
             {
                 Token = token,
-                Expiration = DateTime.UtcNow.AddHours(1)
+                Expiration = DateTime.UtcNow.AddHours(1),
+                RequireVerification = false
+            });
+        }
+
+        // POST: api/auth/verify
+        [AllowAnonymous]
+        [HttpPost("verify")]
+        public async Task<ActionResult<VerifyResponseDto>> VerifyCode([FromBody] VerifyRequestDto request)
+        {
+            var token = await _authService.VerifyCodeAsync(request.Username, request.Password, request.Code);
+            return Ok(new VerifyResponseDto
+            {
+                Token = token,
+                Expiration = DateTime.UtcNow.AddHours(1),
             });
         }
 
