@@ -284,3 +284,7 @@ D:\Learning\IT_Project\KALM_Db\Tests\UnitTests\bin\Debug\net9.0\Swashbuckle.AspN
 D:\Learning\IT_Project\KALM_Db\Tests\UnitTests\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
 D:\Learning\IT_Project\KALM_Db\Tests\UnitTests\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerUI.dll
 D:\Learning\IT_Project\KALM_Db\Tests\UnitTests\bin\Debug\net9.0\API.xml
+D:\Learning\IT_Proj\IT_Project\KALM_Db\Tests\UnitTests\bin\Debug\net9.0\Swashbuckle.AspNetCore.Swagger.dll
+D:\Learning\IT_Proj\IT_Project\KALM_Db\Tests\UnitTests\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+D:\Learning\IT_Proj\IT_Project\KALM_Db\Tests\UnitTests\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+D:\Learning\IT_Proj\IT_Project\KALM_Db\Tests\UnitTests\bin\Debug\net9.0\API.xml

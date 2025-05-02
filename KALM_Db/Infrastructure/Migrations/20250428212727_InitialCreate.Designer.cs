@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250419191903_InitialCreate")]
+    [Migration("20250428212727_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -142,6 +142,63 @@ namespace Infrastructure.Migrations
                     b.ToTable("Subjects");
                 });
 
+            modelBuilder.Entity("Core.Entities.ModelSurvey", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsStandart")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("TeacherGroupId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TeacherId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TeacherSubjectId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TeacherGroupId", "TeacherId", "TeacherSubjectId");
+
+                    b.ToTable("Surveys");
+                });
+
+            modelBuilder.Entity("Core.Entities.ModelSurveyResult", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AnswerJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("SurveyId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SurveyId");
+
+                    b.ToTable("SurveyResults");
+                });
+
             modelBuilder.Entity("Core.Entities.ModelUser", b =>
                 {
                     b.Property<int>("Id")
@@ -247,6 +304,28 @@ namespace Infrastructure.Migrations
                     b.Navigation("Role");
                 });
 
+            modelBuilder.Entity("Core.Entities.ModelSurvey", b =>
+                {
+                    b.HasOne("Core.Entities.ModelGroupTeacher", "Teacher")
+                        .WithMany("Surveys")
+                        .HasForeignKey("TeacherGroupId", "TeacherId", "TeacherSubjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Teacher");
+                });
+
+            modelBuilder.Entity("Core.Entities.ModelSurveyResult", b =>
+                {
+                    b.HasOne("Core.Entities.ModelSurvey", "Survey")
+                        .WithMany("Results")
+                        .HasForeignKey("SurveyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Survey");
+                });
+
             modelBuilder.Entity("Core.Entities.ModelUser", b =>
                 {
                     b.HasOne("Core.Entities.ModelRole", "Role")
@@ -265,6 +344,11 @@ namespace Infrastructure.Migrations
                     b.Navigation("GroupTeachers");
                 });
 
+            modelBuilder.Entity("Core.Entities.ModelGroupTeacher", b =>
+                {
+                    b.Navigation("Surveys");
+                });
+
             modelBuilder.Entity("Core.Entities.ModelPermission", b =>
                 {
                     b.Navigation("PermissionsForRoles");
@@ -280,6 +364,11 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Core.Entities.ModelSubject", b =>
                 {
                     b.Navigation("GroupTeachers");
+                });
+
+            modelBuilder.Entity("Core.Entities.ModelSurvey", b =>
+                {
+                    b.Navigation("Results");
                 });
 
             modelBuilder.Entity("Core.Entities.ModelUser", b =>

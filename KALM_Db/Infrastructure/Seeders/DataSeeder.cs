@@ -155,6 +155,15 @@ namespace Infrastructure.Seeders
                     });
                 }
 
+                var defaultSurvey = new ModelSurvey{
+                    Title = "Опрос об обучении",
+                    Description = "Этот опрос нацелен на оценку того как вас обучают и на то наскоько хорошо составлена учебная программа.",
+                    IsStandart = true,
+                    Teacher = null,
+                    QuestionsJson = ""
+                };
+
+
                 context.PermissionsForRoles.AddRange(rolePermissions);
                 context.SaveChanges();
             }

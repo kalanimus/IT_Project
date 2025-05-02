@@ -1,0 +1,50 @@
+using Core.Entities;
+using Core.Interfaces;
+using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+
+namespace Infrastructure.Repositories;
+
+public class SurveyRepository : ISurveyRepository
+{
+    private readonly AppDbContext _context;
+
+    public SurveyRepository(AppDbContext context)
+    {
+        _context = context;
+    }
+
+    public async Task<ModelSurvey> GetByIdAsync(int id)
+    {
+        return await _context.Surveys
+            .FirstOrDefaultAsync(p => p.Id == id);
+    }
+
+    public async Task<List<ModelSurvey>> GetAllAsync()
+    {
+        return await _context.Surveys
+            .ToListAsync();
+    }
+
+    public async Task AddAsync(ModelSurvey survey)
+    {
+        await _context.Surveys.AddAsync(survey);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateAsync(ModelSurvey survey)
+    {
+        _context.Surveys.Update(survey);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        var survey = await _context.Surveys.FindAsync(id);
+        if (survey != null)
+        {
+            _context.Surveys.Remove(survey);
+            await _context.SaveChangesAsync();
+        }
+    }
+}

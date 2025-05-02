@@ -18,6 +18,8 @@ public class AppDbContext : DbContext
     public DbSet<ModelSubject> Subjects { get; set; }
     public DbSet<ModelPermission> Permissions { get; set; }
     public DbSet<ModelPermissionForRole> PermissionsForRoles { get; set; }
+    public DbSet<ModelSurvey> Surveys { get; set; }
+    public DbSet<ModelSurveyAnswer> SurveyAnswers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

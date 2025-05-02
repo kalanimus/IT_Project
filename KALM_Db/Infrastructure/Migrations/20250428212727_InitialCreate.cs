@@ -141,8 +141,8 @@ namespace Infrastructure.Migrations
                 name: "GroupTeachers",
                 columns: table => new
                 {
-                    GroupId = table.Column<int>(type: "integer", nullable: false),
                     TeacherId = table.Column<int>(type: "integer", nullable: false),
+                    GroupId = table.Column<int>(type: "integer", nullable: false),
                     SubjectId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
@@ -168,6 +168,50 @@ namespace Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Surveys",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Title = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    IsStandart = table.Column<bool>(type: "boolean", nullable: false),
+                    TeacherGroupId = table.Column<int>(type: "integer", nullable: false),
+                    TeacherId = table.Column<int>(type: "integer", nullable: false),
+                    TeacherSubjectId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Surveys", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Surveys_GroupTeachers_TeacherGroupId_TeacherId_TeacherSubje~",
+                        columns: x => new { x.TeacherGroupId, x.TeacherId, x.TeacherSubjectId },
+                        principalTable: "GroupTeachers",
+                        principalColumns: new[] { "GroupId", "TeacherId", "SubjectId" },
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SurveyResults",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    SurveyId = table.Column<int>(type: "integer", nullable: false),
+                    AnswerJson = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SurveyResults", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SurveyResults_Surveys_SurveyId",
+                        column: x => x.SurveyId,
+                        principalTable: "Surveys",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_GroupStudents_StudentId",
                 table: "GroupStudents",
@@ -189,6 +233,16 @@ namespace Infrastructure.Migrations
                 column: "PermissionId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SurveyResults_SurveyId",
+                table: "SurveyResults",
+                column: "SurveyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Surveys_TeacherGroupId_TeacherId_TeacherSubjectId",
+                table: "Surveys",
+                columns: new[] { "TeacherGroupId", "TeacherId", "TeacherSubjectId" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_RoleId",
                 table: "Users",
                 column: "RoleId");
@@ -201,10 +255,19 @@ namespace Infrastructure.Migrations
                 name: "GroupStudents");
 
             migrationBuilder.DropTable(
-                name: "GroupTeachers");
+                name: "PermissionsForRoles");
 
             migrationBuilder.DropTable(
-                name: "PermissionsForRoles");
+                name: "SurveyResults");
+
+            migrationBuilder.DropTable(
+                name: "Permissions");
+
+            migrationBuilder.DropTable(
+                name: "Surveys");
+
+            migrationBuilder.DropTable(
+                name: "GroupTeachers");
 
             migrationBuilder.DropTable(
                 name: "Groups");
@@ -214,9 +277,6 @@ namespace Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users");
-
-            migrationBuilder.DropTable(
-                name: "Permissions");
 
             migrationBuilder.DropTable(
                 name: "Roles");
