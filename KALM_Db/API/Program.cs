@@ -28,6 +28,8 @@ builder.Services.AddScoped<IGroupStudentRepository, GroupStudentRepository>();
 builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
+builder.Services.AddScoped<ISurveyRepository, SurveyRepository>();
+builder.Services.AddScoped<ISurveyAnswerRepository, SurveyAnswerRepository>();
 
 // Регистрация сервисов
 builder.Services.AddScoped<IUserService, UserService>(); // UserService из Application.Services
@@ -44,6 +46,8 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IEmailSenderService, EmailSenderService>();
+builder.Services.AddScoped<ISurveyService, SurveyService>();
+builder.Services.AddScoped<ISurveyAnswerService, SurveyAnswerService>();
 builder.Services.AddTransient<Random>();
 
 // Регистрация AutoMapper
