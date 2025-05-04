@@ -19,6 +19,14 @@ public class SurveyRepository : ISurveyRepository
         return await _context.Surveys
             .FirstOrDefaultAsync(p => p.Id == id);
     }
+    public async Task<List<ModelSurvey>> GetByUserNameAsync(string userName){
+        return await _context.Surveys.Where(p => p.Teacher.Teacher.Username == userName || p.IsStandart).ToListAsync();
+    }
+
+    public async Task<List<ModelSurvey>> GetByGroupAsync(int groupNumber){
+        return await _context.Surveys.Where(p => p.Teacher.GroupId == groupNumber || p.IsStandart).ToListAsync();
+    }
+
 
     public async Task<List<ModelSurvey>> GetAllAsync()
     {

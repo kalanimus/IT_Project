@@ -22,6 +22,15 @@ public class GroupStudentRepository : IGroupStudentRepository
             .FirstOrDefaultAsync(g => g.Group.Id == groupId && g.Student.Id == studentId);
     }
 
+    public async Task<ModelGroupStudent> GetByUsernameAsync(string username)
+    {
+        return await _context.GroupStudents
+        .Include(g => g.Group)
+        .Include(g => g.Student)
+        .FirstOrDefaultAsync(g => g.Student.Username == username);
+    }
+
+
     public async Task<List<ModelGroupStudent>> GetAllAsync()
     {
         return await _context.GroupStudents

@@ -27,15 +27,16 @@ namespace API.Controllers
 
         [HttpGet]
         [Authorize (Roles = "Студент, Преподаватель")]
-        public IActionResult GetSurveys() {
+        public async Task<ActionResult<SurveyResponseDto>> GetSurveys() {
           var userRole = User.Claims.FirstOrDefault (c => c.Type == ClaimTypes.Role)?.Value;
           var userName = User.Claims.FirstOrDefault (c => c.Type == ClaimTypes.Name)?.Value;
-          return userRole switch
-          {
-            "Студент" => Ok(new { Message = "Секретные данные для Студента", Data = userName }),
-            "Преподаватель" => Ok(new { Message = "Обычные данные для Препода", Data = userName }),
-            _ => Ok(new {claims = userName}) // Если роль не подходит (хотя Authorize уже проверил)
-          };
+          var surveys = await _surveyService.GetByUserNameAsync (userName);
+
+          var surveysDto = _mapper.Map<List<SurveyDto>>(surveys);
+          return Ok(new SurveyResponseDto{
+            Surveys = surveysDto,
+            Total = surveysDto.Count()
+          });
         }
     }
 }

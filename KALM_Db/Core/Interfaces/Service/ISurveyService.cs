@@ -2,4 +2,7 @@ using Core.Entities;
 
 namespace Core.Interfaces;
 
-public interface ISurveyService : IService<ModelSurvey> { }
+public interface ISurveyService : IService<ModelSurvey> {
+  Task<List<ModelSurvey>> GetByUserNameAsync(string userName);
+  
+}

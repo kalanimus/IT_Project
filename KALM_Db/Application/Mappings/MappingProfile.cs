@@ -27,6 +27,9 @@ namespace Application.Mappings
 
             CreateMap<ModelGroup, GroupDto>();
             CreateMap<GroupDto, ModelGroup>();
+
+            CreateMap<ModelSurvey, SurveyDto>();
+            CreateMap<SurveyDto, ModelSurvey>();
         }
     }
 }
