@@ -29,11 +29,12 @@ namespace API.Controllers
         [Authorize (Roles = "Студент, Преподаватель")]
         public IActionResult GetSurveys() {
           var userRole = User.Claims.FirstOrDefault (c => c.Type == ClaimTypes.Role)?.Value;
+          var userName = User.Claims.FirstOrDefault (c => c.Type == ClaimTypes.Name)?.Value;
           return userRole switch
           {
-            "Студент" => Ok(new { Message = "Секретные данные для Студента", Data = "ConfidentialInfo" }),
-            "Преподаватель" => Ok(new { Message = "Обычные данные для Препода", Data = "PublicInfo" }),
-            _ => Ok(new {claims = userRole}) // Если роль не подходит (хотя Authorize уже проверил)
+            "Студент" => Ok(new { Message = "Секретные данные для Студента", Data = userName }),
+            "Преподаватель" => Ok(new { Message = "Обычные данные для Препода", Data = userName }),
+            _ => Ok(new {claims = userName}) // Если роль не подходит (хотя Authorize уже проверил)
           };
         }
     }
