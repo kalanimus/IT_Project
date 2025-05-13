@@ -17,26 +17,104 @@ namespace API.Controllers
         private readonly ISurveyService _surveyService;
         private readonly ISurveyAnswerService _surveyAnswerService;
         private readonly IMapper _mapper;
+        private readonly IGroupTeacherService _groupTeacherService;
 
-        public SurveysController(ISurveyService surveyService, ISurveyAnswerService surveyAnswerService, IMapper mapper)
+        public SurveysController(ISurveyService surveyService, ISurveyAnswerService surveyAnswerService, IMapper mapper, IGroupTeacherService groupTeacherService)
         {
             _surveyService = surveyService;
             _surveyAnswerService = surveyAnswerService;
             _mapper = mapper;
+            _groupTeacherService = groupTeacherService;
         }
 
         [HttpGet]
-        [Authorize (Roles = "Студент, Преподаватель")]
-        public async Task<ActionResult<SurveyResponseDto>> GetSurveys() {
-          var userRole = User.Claims.FirstOrDefault (c => c.Type == ClaimTypes.Role)?.Value;
-          var userName = User.Claims.FirstOrDefault (c => c.Type == ClaimTypes.Name)?.Value;
-          var surveys = await _surveyService.GetByUserNameAsync (userName);
+        [Authorize(Roles = "Студент, Преподаватель")]
+        public async Task<ActionResult<SurveyResponseDto>> GetSurveys()
+        {
+            var userName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+            var surveys = await _surveyService.GetByUserNameAsync(userName);
 
-          var surveysDto = _mapper.Map<List<SurveyDto>>(surveys);
-          return Ok(new SurveyResponseDto{
-            Surveys = surveysDto,
-            Total = surveysDto.Count()
-          });
+            var surveysDto = _mapper.Map<List<SurveyDto>>(surveys);
+            return Ok(new SurveyResponseDto
+            {
+                Surveys = surveysDto,
+                Total = surveysDto.Count()
+            });
+        }
+
+        [HttpGet("{id}")]
+        [Authorize(Roles = "Студент, Преподаватель")]
+        public async Task<ActionResult<SurveyDto>> GetSurveyById(int id)
+        {
+            var survey = await _surveyService.GetByIdAsync(id);
+            if (survey == null)
+            {
+                return NotFound($"Survey with ID {id} not found.");
+            }
+
+            var surveyDto = _mapper.Map<SurveyDto>(survey);
+            return Ok(surveyDto);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Преподаватель")]
+        public async Task<ActionResult> CreateSurvey([FromBody] SurveyDto surveyDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // Выполняем асинхронный поиск до маппинга
+            var groupTeacher = await _groupTeacherService.GetByDetailsAsync(surveyDto.Group, surveyDto.Subject, surveyDto.Author);
+            if (groupTeacher == null)
+            {
+                return BadRequest("Некорректные значения для группы, предмета или преподавателя.");
+            }
+
+            // Выполняем маппинг
+            var survey = _mapper.Map<ModelSurvey>(surveyDto);
+            survey.Teacher = groupTeacher;
+
+            await _surveyService.AddAsync(survey);
+
+            return CreatedAtAction(nameof(GetSurveyById), new { id = survey.Id }, surveyDto);
+        }
+
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Преподаватель")]
+        public async Task<ActionResult> UpdateSurvey(int id, [FromBody] SurveyDto surveyDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var existingSurvey = await _surveyService.GetByIdAsync(id);
+            if (existingSurvey == null)
+            {
+                return NotFound($"Survey with ID {id} not found.");
+            }
+
+            var survey = _mapper.Map<ModelSurvey>(surveyDto);
+            survey.Id = id; // Ensure the ID is preserved
+            await _surveyService.UpdateAsync(survey);
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Преподаватель")]
+        public async Task<ActionResult> DeleteSurvey(int id)
+        {
+            var existingSurvey = await _surveyService.GetByIdAsync(id);
+            if (existingSurvey == null)
+            {
+                return NotFound($"Survey with ID {id} not found.");
+            }
+
+            await _surveyService.DeleteAsync(id);
+            return NoContent();
         }
     }
 }

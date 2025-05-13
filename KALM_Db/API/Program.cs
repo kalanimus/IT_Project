@@ -48,6 +48,7 @@ builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IEmailSenderService, EmailSenderService>();
 builder.Services.AddScoped<ISurveyService, SurveyService>();
 builder.Services.AddScoped<ISurveyAnswerService, SurveyAnswerService>();
+builder.Services.AddScoped<IGroupTeacherService, GroupTeacherService>();
 builder.Services.AddTransient<Random>();
 
 // Регистрация AutoMapper

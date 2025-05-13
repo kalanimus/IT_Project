@@ -17,6 +17,12 @@ public class SurveyRepository : ISurveyRepository
     public async Task<ModelSurvey> GetByIdAsync(int id)
     {
         return await _context.Surveys
+            .Include(s => s.Teacher)
+            .ThenInclude(s => s.Teacher)
+            .Include(s => s.Teacher)
+            .ThenInclude(s => s.Group)
+            .Include(s => s.Teacher)
+            .ThenInclude(s => s.Subject)
             .FirstOrDefaultAsync(p => p.Id == id);
     }
     public async Task<List<ModelSurvey>> GetByUserNameAsync(string userName){
