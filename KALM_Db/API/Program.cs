@@ -87,9 +87,9 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Schedule API",
+        Title = "KALM API",
         Version = "v1",
-        Description = "API для управления расписанием и аутентификации",
+        Description = "API для управления опросами, группами и пользователями",
     });
 
     // Включение детализации ошибок (если используются исключения)
@@ -98,14 +98,15 @@ builder.Services.AddSwaggerGen(c =>
     // JWT в Swagger
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "JWT Authorization header. Example: \"Bearer {token}\"",
         Name = "Authorization",
-        In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Введите токен JWT в формате: Bearer {токен}"
     });
 
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
             new OpenApiSecurityScheme
@@ -114,12 +115,9 @@ builder.Services.AddSwaggerGen(c =>
                 {
                     Type = ReferenceType.SecurityScheme,
                     Id = "Bearer"
-                },
-                Scheme = "oauth2",
-                Name = "Bearer",
-                In = ParameterLocation.Header,
+                }
             },
-            new List<string>()
+            new string[] {}
         }
     });
 
@@ -130,6 +128,9 @@ builder.Services.AddSwaggerGen(c =>
     // {
     //     c.IncludeXmlComments(xmlPath);
     // }
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
 });
 
 var app = builder.Build();
@@ -157,7 +158,7 @@ using (var scope = app.Services.CreateScope())
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Schedule API v1");
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "KALM API v1");
     c.RoutePrefix = "swagger"; // Доступ по /swagger
 });
 

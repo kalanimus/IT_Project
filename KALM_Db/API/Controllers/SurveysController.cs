@@ -171,13 +171,14 @@ namespace API.Controllers
         [Authorize(Roles = "Преподаватель")]
         public async Task<ActionResult<SurveyAnalyticsDto>> GetSurveyAnalytics(int id)
         {
+            var userName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
             var survey = await _surveyService.GetByIdAsync(id);
             if (survey == null)
             {
                 return NotFound($"Survey with ID {id} not found.");
             }
 
-            var analytics = await _surveyService.GetAnalyticsAsync(id);
+            var analytics = await _surveyService.GetAnalyticsAsync(id, userName);
             var analyticsDto = _mapper.Map<SurveyAnalyticsDto>(analytics);
 
             return Ok(analyticsDto);

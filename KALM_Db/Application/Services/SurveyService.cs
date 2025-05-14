@@ -59,7 +59,20 @@ namespace Application.Services
                     return surveys;
                 } else if (user.Role.RoleName == "Преподаватель")
                 {
-                    return await _surveyRepository.GetByUserNameAsync(userName);
+                    var groups = await _groupTeacherRepository.GetGroupTeachersByIdAsync(user.Id);
+
+                    var standartSurvey = await _surveyRepository.GetStandartAsync();
+                    var surveys = groups.Select(t => new ModelSurvey
+                    {
+                        Id = standartSurvey.Id,
+                        Title = $"{standartSurvey.Title} ({t.Subject.SubjectName})",
+                        Description = null,
+                        IsStandart = true,
+                        Teacher = t,
+                        QuestionsJson = null
+                    }).ToList();
+                    surveys.AddRange(await _surveyRepository.GetByUserNameAsync(userName));
+                    return surveys;
                 } else throw new ForbiddenException("Wrong role", "Неверная роль");
             } else throw new UserNotFoundException();
         }
@@ -99,28 +112,63 @@ namespace Application.Services
             await _surveyRepository.DeleteAsync(survey.Id);
         }
 
-        public async Task<ModelSurveyAnalytics> GetAnalyticsAsync(int surveyId)
+        public async Task<ModelSurveyAnalytics> GetAnalyticsAsync(int surveyId, string userName)
         {
             var survey = await _surveyRepository.GetByIdAsync(surveyId);
             if (survey == null) throw new Exception("Survey not found");
             var surveyAnswers = _mapper.Map<List<SurveyAnswerDto>>(await _surveyAnswerRepository.GetBySurveyIdAsync(surveyId));
             if (survey.IsStandart)
             {
-                // await MakeStandartAnalyticsAsync(surveyAnswers);
+                await MakeStandartAnalyticsAsync(surveyAnswers);
             }
             return null;
 
             
-
-            // Perform analytics logic here
-            // For example, calculate average scores, response rates, etc.
-            // Return the analytics result
         }
 
-        // public async Task MakeStandartAnalyticsAsync(SurveyAnswerDto survey)
-        // {
-            
-        // }
+        public async Task<ModelSurveyAnalytics> MakeStandartAnalyticsAsync(List<SurveyAnswerDto> surveyAnswers)
+        {
+            var analytics = new ModelSurveyAnalytics
+            {
+                Params = new List<ModelAnswerParam>()
+            };
+
+            // Группируем ответы по тексту вопроса
+            var questionGroups = surveyAnswers
+                .SelectMany(answer => answer.Answers) // Разворачиваем все ответы
+                .GroupBy(question => question.Question); // Группируем по тексту вопроса
+
+            foreach (var group in questionGroups)
+            {
+                var questionText = group.Key;
+                var scores = group
+                    .Select(q =>
+                    {
+                        if (int.TryParse(q.Answer, out var score))
+                        {
+                            return score; // Успешно преобразованное значение
+                        }
+                        return (int?)null; // Если преобразование не удалось
+                    })
+                    .Where(score => score.HasValue) // Исключаем некорректные значения
+                    .Select(score => score.Value) // Преобразуем в int
+                    .ToList();
+
+                // Подсчитываем количество ответов и среднее арифметическое
+                var count = scores.Count;
+                var average = scores.Any() ? scores.Average() : 0;
+
+                // Добавляем данные в аналитику
+                analytics.Params.Add(new ModelAnswerParam
+                {
+                    Param = questionText,
+                    Count = count,
+                    Average = average
+                });
+            }
+
+            return analytics;
+        }
         
     }
 }

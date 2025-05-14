@@ -6,6 +6,7 @@ public interface IGroupTeacherRepository
 {
   Task<ModelGroupTeacher> GetByIdsAsync(int groupId, int teacherId, int subjectId);
   Task<List<ModelGroupTeacher>> GetByGroupIdAsync(int groupId);
+  Task<List<ModelGroupTeacher>> GetGroupTeachersByIdAsync(int teacherId);
   Task<List<ModelGroupTeacher>> GetAllAsync();
   Task AddAsync(ModelGroupTeacher entity);
   Task UpdateAsync(ModelGroupTeacher entity);

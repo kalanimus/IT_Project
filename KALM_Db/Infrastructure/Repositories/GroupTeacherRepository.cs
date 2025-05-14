@@ -32,6 +32,15 @@ public class GroupTeacherRepository : IGroupTeacherRepository
             .FirstOrDefaultAsync(g => g.Group.Id == groupId && g.Teacher.Id == teacherId && g.Subject.Id == subjectId);
     }
 
+    public async Task<List<ModelGroupTeacher>> GetGroupTeachersByIdAsync(int teacherId)
+    {
+        return await _context.GroupTeachers
+            .Include(g => g.Group)
+            .Include(g => g.Subject)
+            .Where(g => g.Teacher.Id == teacherId)
+            .ToListAsync();
+    }
+
     public async Task<List<ModelGroupTeacher>> GetAllAsync()
     {
         return await _context.GroupTeachers
