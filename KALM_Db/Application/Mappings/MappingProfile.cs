@@ -67,6 +67,15 @@ namespace Application.Mappings
                       Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic)
                   })))
               .ForMember(dest => dest.Teacher, opt => opt.Ignore());
+
+            CreateMap<SurveyAnswerDto, ModelSurveyAnswer>()
+              .ForMember(dest => dest.AnswerJson,
+                opt => opt.MapFrom(src =>
+                  JsonSerializer.Serialize(src.Params, new JsonSerializerOptions
+                  {
+                      Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic)
+                  })));
+            
         }
     }
 }

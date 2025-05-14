@@ -7,6 +7,8 @@ public class ModelUser
   public string ?Username { get; set; }
   public string ?PasswordHash { get; set; }
   public int Balance { get; set; }
+  public float Rating { get; set; }
+  public int ActivityRate { get; set; }
   public string ?Email { get; set; }
   public int ?VerificationCode { get; set; }
   public bool IsConfirmed { get; set; }

@@ -116,5 +116,44 @@ namespace API.Controllers
             await _surveyService.DeleteAsync(id);
             return NoContent();
         }
+
+        [HttpPost("{id}/complete")]
+        [Authorize(Roles = "Студент")]
+        public async Task<ActionResult> CompleteSurvey(int id, [FromBody] SurveyAnswerDto surveyAnswerDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var existingSurvey = await _surveyService.GetByIdAsync(id);
+            if (existingSurvey == null)
+            {
+                return NotFound($"Survey with ID {id} not found.");
+            }
+
+            var surveyAnswer = _mapper.Map<ModelSurveyAnswer>(surveyAnswerDto);
+            surveyAnswer.SurveyId = id;
+
+            await _surveyAnswerService.AddAsync(surveyAnswer);
+
+            return Ok();
+        }
+
+        // [HttpGet("{id}/analytics")]
+        // [Authorize(Roles = "Преподаватель")]
+        // public async Task<ActionResult<SurveyAnalyticsDto>> GetSurveyAnalytics(int id)
+        // {
+        //     var survey = await _surveyService.GetByIdAsync(id);
+        //     if (survey == null)
+        //     {
+        //         return NotFound($"Survey with ID {id} not found.");
+        //     }
+
+        //     var analytics = await _surveyService.GetAnalyticsAsync(id);
+        //     var analyticsDto = _mapper.Map<SurveyAnalyticsDto>(analytics);
+
+        //     return Ok(analyticsDto);
+        // }
     }
 }

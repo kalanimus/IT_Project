@@ -74,5 +74,21 @@ namespace Application.Services
 
             await _surveyRepository.DeleteAsync(survey.Id);
         }
+
+        public async Task GetAnalyticsAsync(int surveyId)
+        {
+            var survey = await _surveyRepository.GetByIdAsync(surveyId);
+            if (survey == null) throw new Exception("Survey not found");
+
+            // Perform analytics logic here
+            // For example, calculate average scores, response rates, etc.
+            // Return the analytics result
+        }
+
+        public async Task GetStandartAnalyticsAsync(ModelSurvey survey)
+        {
+            
+        }
+        
     }
 }
