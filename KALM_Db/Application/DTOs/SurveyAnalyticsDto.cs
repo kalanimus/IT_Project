@@ -4,5 +4,5 @@ public class SurveyAnalyticsDto
 {
     public int SurveyId { get; set; }
     public int Total { get; set; }
-    public List<AnswerParamDto> Params { get; set; }
+    public List<SurveyAnswerDto> Answers { get; set; }
 }

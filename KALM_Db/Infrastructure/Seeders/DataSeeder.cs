@@ -206,37 +206,6 @@ namespace Infrastructure.Seeders
                     Teacher = allGroupTeacher,
                     QuestionsJson = JsonSerializer.Serialize(new List<ModelSurveyPart> 
                     {
-                        new ModelSurveyPart 
-                        {
-                            Title = "Оценка круса",
-                            Questions = new List<ModelQuestion>
-                            {
-                                new ModelQuestion 
-                                {
-                                    Type = QuestionType.multiple_choice,
-                                    Text = "Полезность курса для Вашей будущей карьеры",
-                                    Options = ["1", "2", "3", "4", "5", "Затрудняюсь ответить"]
-                                },
-                                new ModelQuestion 
-                                {
-                                    Type = QuestionType.multiple_choice,
-                                    Text = "Полезность курса для расширения кругозора и разностороннего развития",
-                                    Options = ["1", "2", "3", "4", "5", "Затрудняюсь ответить"]
-                                },
-                                new ModelQuestion 
-                                {
-                                    Type = QuestionType.multiple_choice,
-                                    Text = "Новизна полученных знаний",
-                                    Options = ["1", "2", "3", "4", "5", "Затрудняюсь ответить"]
-                                },
-                                new ModelQuestion 
-                                {
-                                    Type = QuestionType.multiple_choice,
-                                    Text = "Сложность курса для успешного прохождения (1 - очень легкий, 5 - очень сложный)",
-                                    Options = ["1", "2", "3", "4", "5", "Затрудняюсь ответить"]
-                                }
-                            }
-                        }, 
                         new ModelSurveyPart
                         {
                             Title = "Оценка преподователя",
@@ -267,7 +236,38 @@ namespace Infrastructure.Seeders
                                     Options = ["1", "2", "3", "4", "5", "Затрудняюсь ответить"]
                                 }
                             }
-                        }, 
+                        },
+                        new ModelSurveyPart 
+                        {
+                            Title = "Оценка круса",
+                            Questions = new List<ModelQuestion>
+                            {
+                                new ModelQuestion 
+                                {
+                                    Type = QuestionType.multiple_choice,
+                                    Text = "Полезность курса для Вашей будущей карьеры",
+                                    Options = ["1", "2", "3", "4", "5", "Затрудняюсь ответить"]
+                                },
+                                new ModelQuestion 
+                                {
+                                    Type = QuestionType.multiple_choice,
+                                    Text = "Полезность курса для расширения кругозора и разностороннего развития",
+                                    Options = ["1", "2", "3", "4", "5", "Затрудняюсь ответить"]
+                                },
+                                new ModelQuestion 
+                                {
+                                    Type = QuestionType.multiple_choice,
+                                    Text = "Новизна полученных знаний",
+                                    Options = ["1", "2", "3", "4", "5", "Затрудняюсь ответить"]
+                                },
+                                new ModelQuestion 
+                                {
+                                    Type = QuestionType.multiple_choice,
+                                    Text = "Сложность курса для успешного прохождения (1 - очень легкий, 5 - очень сложный)",
+                                    Options = ["1", "2", "3", "4", "5", "Затрудняюсь ответить"]
+                                }
+                            }
+                        },  
                         new ModelSurveyPart
                         {
                             Title = "Общий комментарий",

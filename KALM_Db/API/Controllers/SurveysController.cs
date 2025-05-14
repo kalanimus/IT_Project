@@ -6,6 +6,7 @@ using Core.Interfaces;
 using Application.DTOs;
 using AutoMapper;
 using System.Security.Claims;
+using API.Extras;
 
 namespace API.Controllers
 {
@@ -18,13 +19,20 @@ namespace API.Controllers
         private readonly ISurveyAnswerService _surveyAnswerService;
         private readonly IMapper _mapper;
         private readonly IGroupTeacherService _groupTeacherService;
+        private readonly IRatingService _ratingService;
 
-        public SurveysController(ISurveyService surveyService, ISurveyAnswerService surveyAnswerService, IMapper mapper, IGroupTeacherService groupTeacherService)
+        public SurveysController(
+            ISurveyService surveyService,
+            ISurveyAnswerService surveyAnswerService,
+            IMapper mapper,
+            IGroupTeacherService groupTeacherService,
+            IRatingService ratingService)
         {
             _surveyService = surveyService;
             _surveyAnswerService = surveyAnswerService;
             _mapper = mapper;
             _groupTeacherService = groupTeacherService;
+            _ratingService = ratingService;
         }
 
         [HttpGet]
@@ -135,20 +143,24 @@ namespace API.Controllers
             var surveyAnswer = _mapper.Map<ModelSurveyAnswer>(surveyAnswerDto);
             surveyAnswer.SurveyId = id;
 
-            // if (existingSurvey.IsStandart)
-            // {
-            //     var userName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
-            //     var groupTeacher = await _groupTeacherService.GetByDetailsAsync(surveyAnswerDto.Group, surveyAnswerDto.Subject, userName);
-            //     if (groupTeacher == null)
-            //     {
-            //         return BadRequest("Некорректные значения для группы, предмета или преподавателя.");
-            //     }
-            //     surveyAnswer.Survey.Teacher = groupTeacher;
-            // }
-
+            if (existingSurvey.IsStandart)
             {
-                return BadRequest("AnswerJson cannot be null.");
+                var teacher = await _groupTeacherService.GetByDetailsAsync(
+                    surveyAnswerDto.Group,
+                    surveyAnswerDto.Subject,
+                    surveyAnswerDto.TargetTeacher);
+                if (teacher == null)
+                {
+                    return BadRequest("Некорректные значения для группы, предмета или преподавателя.");
+                }
+
+                await _ratingService.CalculateRatingAsync(surveyAnswerDto);
+                await _surveyAnswerService.AddAsync(surveyAnswer);
+                return Ok("Ответ успешно сохранен и рейтинг обновлен.");
+                
+
             }
+
 
             await _surveyAnswerService.AddAsync(surveyAnswer);
 

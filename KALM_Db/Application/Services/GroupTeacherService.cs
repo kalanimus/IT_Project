@@ -25,6 +25,11 @@ public class GroupTeacherService : IGroupTeacherService
         var group = await _groupRepository.GetByGroupNameAsync(groupName);
         var subject = await _subjectRepository.GetByNameAsync(subjectName);
         var teacher = await _userRepository.GetByUsernameAsync(teacherName);
+        
+        if (teacher == null)
+        {
+            teacher = await _userRepository.GetByFullNameAsync(teacherName);
+        }
 
         if (group == null || subject == null || teacher == null)
         {

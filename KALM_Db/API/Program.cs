@@ -12,7 +12,8 @@ using Microsoft.IdentityModel.Tokens;
 using API.Middleware;
 using System.Text;
 using Microsoft.OpenApi.Models; // Добавлено для Swagger
-using System.Reflection; // Добавлено для XML-документации
+using System.Reflection;
+using API.Extras; // Добавлено для XML-документации
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +50,7 @@ builder.Services.AddScoped<IEmailSenderService, EmailSenderService>();
 builder.Services.AddScoped<ISurveyService, SurveyService>();
 builder.Services.AddScoped<ISurveyAnswerService, SurveyAnswerService>();
 builder.Services.AddScoped<IGroupTeacherService, GroupTeacherService>();
+builder.Services.AddScoped<IRatingService, RatingService>();
 builder.Services.AddTransient<Random>();
 
 // Регистрация AutoMapper

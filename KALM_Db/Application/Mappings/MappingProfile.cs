@@ -39,8 +39,8 @@ namespace Application.Mappings
             CreateMap<ModelSurveyAnalytics, SurveyAnalyticsDto>();
             CreateMap<SurveyAnalyticsDto, ModelSurveyAnalytics>();
 
-            CreateMap<ModelAnswerParam, AnswerParamDto>();
-            CreateMap<AnswerParamDto, ModelAnswerParam>();
+            CreateMap<ModelAnswerParam, QuestionAnswerDto>();
+            CreateMap<QuestionAnswerDto, ModelAnswerParam>();
 
             CreateMap<ModelSurvey, SurveyDto>()
             .ForMember(dest => dest.Author, opt => opt.MapFrom(src => src.Teacher.Teacher.FullName))
@@ -80,14 +80,14 @@ namespace Application.Mappings
             CreateMap<SurveyAnswerDto, ModelSurveyAnswer>()
               .ForMember(dest => dest.AnswerJson,
                 opt => opt.MapFrom(src =>
-                  JsonSerializer.Serialize(src.Params, new JsonSerializerOptions
+                  JsonSerializer.Serialize(src.Answers, new JsonSerializerOptions
                   {
                       Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic)
                   })))
               .ReverseMap()
-              .ForMember(dest => dest.Params,
+              .ForMember(dest => dest.Answers,
                 opt => opt.MapFrom(src =>
-                  JsonSerializer.Deserialize<List<AnswerParamDto>>(src.AnswerJson, new JsonSerializerOptions
+                  JsonSerializer.Deserialize<List<QuestionAnswerDto>>(src.AnswerJson, new JsonSerializerOptions
                   {
                       Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic)
                   })));

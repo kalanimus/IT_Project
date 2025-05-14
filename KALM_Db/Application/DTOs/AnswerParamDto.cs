@@ -1,7 +1,7 @@
 namespace Application.DTOs;
 
-public class AnswerParamDto
+public class QuestionAnswerDto
 {
-    public string ParameterName { get; set; }
-    public string Value { get; set; }
+    public string Question { get; set; }
+    public string Answer { get; set; }
 }
