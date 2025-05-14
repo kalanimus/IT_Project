@@ -14,6 +14,15 @@ public class GroupTeacherRepository : IGroupTeacherRepository
         _context = context;
     }
 
+    public async Task<List<ModelGroupTeacher>> GetByGroupIdAsync(int groupId)
+    {
+        return await _context.GroupTeachers
+            .Include(g => g.Group)
+            .Include(g => g.Teacher)
+            .Include(g => g.Subject)
+            .Where(g => g.Group.Id == groupId).ToListAsync();
+    }
+
     public async Task<ModelGroupTeacher> GetByIdsAsync(int groupId, int teacherId, int subjectId)
     {
         return await _context.GroupTeachers

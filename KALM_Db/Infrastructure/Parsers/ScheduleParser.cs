@@ -21,7 +21,7 @@ public class ScheduleParser : IScheduleParser
             items.Add(new ModelGroupTeacher
             {
                 // Показываем пример без ID (они будут установлены в сервисе)
-                Group = new ModelGroup { Group_Name = record.Group },
+                Group = new ModelGroup { GroupName = record.Group },
                 Teacher = new ModelUser 
                 { 
                     FullName = record.Teacher,

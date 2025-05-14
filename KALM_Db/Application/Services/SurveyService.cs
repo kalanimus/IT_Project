@@ -1,3 +1,5 @@
+using Application.DTOs;
+using AutoMapper;
 using Core.Entities;
 using Core.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,17 +9,26 @@ namespace Application.Services
     public class SurveyService : ISurveyService
     {
         private readonly ISurveyRepository _surveyRepository;
+        private readonly ISurveyAnswerRepository _surveyAnswerRepository;
+        private readonly IMapper _mapper;
         private readonly IUserRepository _userRepository;
         private readonly IGroupStudentRepository _groupStudentRepository;
+        private readonly IGroupTeacherRepository _groupTeacherRepository;
 
         public SurveyService(
             ISurveyRepository surveyRepository,
+            ISurveyAnswerRepository surveyAnswerRepository,
             IUserRepository userRepository,
-            IGroupStudentRepository groupStudentRepository)
+            IMapper mapper,
+            IGroupStudentRepository groupStudentRepository,
+            IGroupTeacherRepository groupTeacherRepository)
         {
             _surveyRepository = surveyRepository;
+            _surveyAnswerRepository = surveyAnswerRepository;
+            _mapper = mapper;
             _userRepository = userRepository;
             _groupStudentRepository = groupStudentRepository;
+            _groupTeacherRepository = groupTeacherRepository;
         }
 
         public async Task<ModelSurvey> GetByIdAsync(int id)
@@ -32,7 +43,20 @@ namespace Application.Services
                 if (user.Role.RoleName == "Студент")
                 {
                     var group = await _groupStudentRepository.GetByUsernameAsync(userName);
-                    return await _surveyRepository.GetByGroupAsync(group.GroupId);
+                    var teachers = await _groupTeacherRepository.GetByGroupIdAsync(group.GroupId);
+                    var standartSurvey = await _surveyRepository.GetStandartAsync();
+
+                    var surveys = teachers.Select(t => new ModelSurvey
+                    {
+                        Id = standartSurvey.Id,
+                        Title = $"{standartSurvey.Title} ({t.Subject.SubjectName})",
+                        Description = standartSurvey.Description,
+                        IsStandart = true,
+                        Teacher = t,
+                        QuestionsJson = standartSurvey.QuestionsJson
+                    }).ToList();
+                    surveys.AddRange(await _surveyRepository.GetByGroupAsync(group.GroupId));
+                    return surveys;
                 } else if (user.Role.RoleName == "Преподаватель")
                 {
                     return await _surveyRepository.GetByUserNameAsync(userName);
@@ -75,20 +99,28 @@ namespace Application.Services
             await _surveyRepository.DeleteAsync(survey.Id);
         }
 
-        public async Task GetAnalyticsAsync(int surveyId)
+        public async Task<ModelSurveyAnalytics> GetAnalyticsAsync(int surveyId)
         {
             var survey = await _surveyRepository.GetByIdAsync(surveyId);
             if (survey == null) throw new Exception("Survey not found");
+            var surveyAnswers = _mapper.Map<List<SurveyAnswerDto>>(await _surveyAnswerRepository.GetBySurveyIdAsync(surveyId));
+            if (survey.IsStandart)
+            {
+                // await MakeStandartAnalyticsAsync(surveyAnswers);
+            }
+            return null;
+
+            
 
             // Perform analytics logic here
             // For example, calculate average scores, response rates, etc.
             // Return the analytics result
         }
 
-        public async Task GetStandartAnalyticsAsync(ModelSurvey survey)
-        {
+        // public async Task MakeStandartAnalyticsAsync(SurveyAnswerDto survey)
+        // {
             
-        }
+        // }
         
     }
 }

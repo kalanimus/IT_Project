@@ -22,7 +22,7 @@ public class ScheduleParserTests
         Assert.NotNull(result);
         Assert.Equal(2, result.Count);
         
-        Assert.Equal("Group1", result[0].Group.Group_Name);
+        Assert.Equal("Group1", result[0].Group.GroupName);
         Assert.Equal("Иванов И.И.", result[0].Teacher.FullName);
         Assert.Equal("Математика", result[0].Subject.SubjectName);
     }

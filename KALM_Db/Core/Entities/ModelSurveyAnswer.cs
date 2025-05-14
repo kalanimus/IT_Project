@@ -8,6 +8,4 @@ public class ModelSurveyAnswer
   public int SurveyId { get; set; }
   public ModelSurvey Survey { get; set; }
   public string AnswerJson { get; set; }
-
-  
 }

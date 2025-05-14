@@ -1,6 +1,6 @@
 namespace Application.DTOs;
 
-public class SurveyAnalitycsDto
+public class SurveyAnalyticsDto
 {
     public int SurveyId { get; set; }
     public int Total { get; set; }

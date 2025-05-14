@@ -31,6 +31,6 @@ public class GroupTeacherService : IGroupTeacherService
             throw new Exception("Не удалось найти одну из связанных записей (группа, предмет или преподаватель).");
         }
 
-        return await _groupTeacherRepository.GetByIdsAsync(group.Id, subject.Id, teacher.Id);
+        return await _groupTeacherRepository.GetByIdsAsync(group.Id, teacher.Id, subject.Id);
     }
 }

@@ -41,10 +41,10 @@ public class ScheduleService : IScheduleService
             foreach (var item in parsedItems)
             {
                 // 1. Работа с группой
-                var group = await _groupRepository.GetByGroupNameAsync(item.Group.Group_Name);
+                var group = await _groupRepository.GetByGroupNameAsync(item.Group.GroupName);
                 if (group == null)
                 {
-                    group = new ModelGroup { Group_Name = item.Group.Group_Name };
+                    group = new ModelGroup { GroupName = item.Group.GroupName };
                 }
 
                 // 2. Работа с преподавателем

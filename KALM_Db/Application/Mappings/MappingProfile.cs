@@ -19,7 +19,8 @@ namespace Application.Mappings
               .ForMember(dest => dest.RoleId, opt => opt.MapFrom(src => src.RoleId))
               .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.Role.RoleName));
             CreateMap<UserDto, ModelUser>()
-              .ForMember(dest => dest.RoleId, opt => opt.MapFrom(src => src.RoleId));
+              .ForMember(dest => dest.RoleId, opt => opt.MapFrom(src => src.RoleId))
+              .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => src.Password));
 
             CreateMap<ModelSubject, SubjectDto>();
             CreateMap<SubjectDto, ModelSubject>();
@@ -27,16 +28,24 @@ namespace Application.Mappings
             CreateMap<ModelRole, RoleDto>();
             CreateMap<RoleDto, ModelRole>();
 
+            CreateMap<ModelGroupTeacher, GroupTeacherDto>().ReverseMap();
+
             CreateMap<ModelPermission, PermissionDto>();
             CreateMap<PermissionDto, ModelPermission>();
 
             CreateMap<ModelGroup, GroupDto>();
             CreateMap<GroupDto, ModelGroup>();
 
+            CreateMap<ModelSurveyAnalytics, SurveyAnalyticsDto>();
+            CreateMap<SurveyAnalyticsDto, ModelSurveyAnalytics>();
+
+            CreateMap<ModelAnswerParam, AnswerParamDto>();
+            CreateMap<AnswerParamDto, ModelAnswerParam>();
+
             CreateMap<ModelSurvey, SurveyDto>()
             .ForMember(dest => dest.Author, opt => opt.MapFrom(src => src.Teacher.Teacher.FullName))
             .ForMember(dest => dest.Subject, opt => opt.MapFrom(src => src.Teacher.Subject.SubjectName))
-            .ForMember(dest => dest.Group, opt => opt.MapFrom(src => src.Teacher.Group.Group_Name))
+            .ForMember(dest => dest.Group, opt => opt.MapFrom(src => src.Teacher.Group.GroupName))
             .ForMember(dest => dest.QuestionsJson, 
               opt => opt.MapFrom(src => 
               JsonSerializer.Deserialize<List<ModelSurveyPart>>(src.QuestionsJson, new JsonSerializerOptions
@@ -46,11 +55,11 @@ namespace Application.Mappings
                   })
                 .Select(part => new SurveyPartDto
                 {
-                    Title = part.Title,
+                    Title = part.Title.ToString(),
                     Questions = part.Questions.Select(q => new QuestionDto
                     {
                         Type = Enum.GetName(typeof(QuestionType), q.Type).ToString(),
-                        Text = q.Text,
+                        Text = q.Text.ToString(),
                         Options = q.Options
                     }).ToList()
                 }).ToList()
@@ -72,6 +81,13 @@ namespace Application.Mappings
               .ForMember(dest => dest.AnswerJson,
                 opt => opt.MapFrom(src =>
                   JsonSerializer.Serialize(src.Params, new JsonSerializerOptions
+                  {
+                      Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic)
+                  })))
+              .ReverseMap()
+              .ForMember(dest => dest.Params,
+                opt => opt.MapFrom(src =>
+                  JsonSerializer.Deserialize<List<AnswerParamDto>>(src.AnswerJson, new JsonSerializerOptions
                   {
                       Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic)
                   })));

@@ -21,7 +21,7 @@ public class StudentsParser : IStudentsParser
             items.Add(new ModelGroupStudent
             {
                 // Показываем пример без ID (они будут установлены в сервисе)
-                Group = new ModelGroup { Group_Name = record.Group },
+                Group = new ModelGroup { GroupName = record.Group },
                 Student = new ModelUser 
                 { 
                     FullName = record.FullName,

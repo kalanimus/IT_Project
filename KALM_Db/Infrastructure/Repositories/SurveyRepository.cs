@@ -14,6 +14,12 @@ public class SurveyRepository : ISurveyRepository
         _context = context;
     }
 
+  public async Task<ModelSurvey> GetStandartAsync()
+  {
+    return await _context.Surveys.FirstOrDefaultAsync(p => p.IsStandart);
+  }
+
+
     public async Task<ModelSurvey> GetByIdAsync(int id)
     {
         return await _context.Surveys
@@ -26,11 +32,11 @@ public class SurveyRepository : ISurveyRepository
             .FirstOrDefaultAsync(p => p.Id == id);
     }
     public async Task<List<ModelSurvey>> GetByUserNameAsync(string userName){
-        return await _context.Surveys.Where(p => p.Teacher.Teacher.Username == userName || p.IsStandart).ToListAsync();
+        return await _context.Surveys.Where(p => p.Teacher.Teacher.Username == userName).ToListAsync();
     }
 
     public async Task<List<ModelSurvey>> GetByGroupAsync(int groupNumber){
-        return await _context.Surveys.Where(p => p.Teacher.GroupId == groupNumber || p.IsStandart).ToListAsync();
+        return await _context.Surveys.Where(p => p.Teacher.GroupId == groupNumber).ToListAsync();
     }
 
 

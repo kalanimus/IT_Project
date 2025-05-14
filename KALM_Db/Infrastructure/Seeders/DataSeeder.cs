@@ -29,7 +29,7 @@ namespace Infrastructure.Seeders
             
              if (!context.Groups.Any())
             {
-                context.Groups.Add(new ModelGroup {Group_Name = "All"});
+                context.Groups.Add(new ModelGroup {GroupName = "All"});
                 context.SaveChanges();
             }
 
@@ -200,7 +200,7 @@ namespace Infrastructure.Seeders
                 context.SaveChanges();
 
                 var defaultSurvey = new ModelSurvey{
-                    Title = "Опрос об обучении",
+                    Title = "Обратная связь по курсу",
                     Description = "Этот опрос нацелен на оценку того как вас обучают и на то наскоько хорошо составлена учебная программа.",
                     IsStandart = true,
                     Teacher = allGroupTeacher,

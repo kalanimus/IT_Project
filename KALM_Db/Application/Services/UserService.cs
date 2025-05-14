@@ -13,6 +13,7 @@ namespace Application.Services
         private readonly IGroupStudentRepository _groupStudentRepository;
         private readonly IGroupRepository _groupRepository;
         private readonly IUsernameGeneratorService _usernameGeneratorService;
+        private readonly IPasswordHasher _hasher;
 
 
         public UserService(
@@ -20,13 +21,15 @@ namespace Application.Services
             IStudentsParser studentsParser,
             IGroupStudentRepository groupStudentRepository,
             IGroupRepository groupRepository,
-            IUsernameGeneratorService usernameGeneratorService)
+            IUsernameGeneratorService usernameGeneratorService,
+            IPasswordHasher hasher)
         {
             _userRepository = userRepository;
             _studentsParser = studentsParser;
             _groupStudentRepository = groupStudentRepository;
             _groupRepository = groupRepository;
             _usernameGeneratorService = usernameGeneratorService;
+            _hasher = hasher;
         }
 
         public async Task<ModelUser> GetByIdAsync(int id)
@@ -41,6 +44,7 @@ namespace Application.Services
 
         public async Task AddAsync(ModelUser user)
         {
+            user.PasswordHash = _hasher.Hash(user.PasswordHash);
             await _userRepository.AddAsync(user);
         }
 
@@ -77,10 +81,10 @@ namespace Application.Services
                 foreach (var item in parsedItems)
                 {
                     // 1. Работа с группой
-                    var group = await _groupRepository.GetByGroupNameAsync(item.Group.Group_Name);
+                    var group = await _groupRepository.GetByGroupNameAsync(item.Group.GroupName);
                     if (group == null)
                     {
-                        group = new ModelGroup { Group_Name = item.Group.Group_Name };
+                        group = new ModelGroup { GroupName = item.Group.GroupName };
                     }
 
                     // 2. Работа с преподавателем

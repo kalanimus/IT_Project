@@ -25,7 +25,7 @@ public class GroupRepository : IGroupRepository
     public async Task<ModelGroup> GetByGroupNameAsync(string GroupName)
     {
         return await _context.Groups
-            .FirstOrDefaultAsync(u => u.Group_Name == GroupName);
+            .FirstOrDefaultAsync(u => u.GroupName == GroupName);
     }
 
     public async Task<List<ModelGroup>> GetAllAsync()

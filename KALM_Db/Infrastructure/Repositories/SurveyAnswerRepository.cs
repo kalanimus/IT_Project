@@ -14,6 +14,12 @@ public class SurveyAnswerRepository : ISurveyAnswerRepository
         _context = context;
     }
 
+    public async Task<List<ModelSurveyAnswer>> GetBySurveyIdAsync(int surveyId)
+    {
+        return await _context.SurveyAnswers
+            .Where(p => p.SurveyId == surveyId).ToListAsync();
+    }
+
     public async Task<ModelSurveyAnswer> GetByIdAsync(int id)
     {
         return await _context.SurveyAnswers

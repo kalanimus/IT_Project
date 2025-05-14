@@ -135,25 +135,40 @@ namespace API.Controllers
             var surveyAnswer = _mapper.Map<ModelSurveyAnswer>(surveyAnswerDto);
             surveyAnswer.SurveyId = id;
 
+            // if (existingSurvey.IsStandart)
+            // {
+            //     var userName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+            //     var groupTeacher = await _groupTeacherService.GetByDetailsAsync(surveyAnswerDto.Group, surveyAnswerDto.Subject, userName);
+            //     if (groupTeacher == null)
+            //     {
+            //         return BadRequest("Некорректные значения для группы, предмета или преподавателя.");
+            //     }
+            //     surveyAnswer.Survey.Teacher = groupTeacher;
+            // }
+
+            {
+                return BadRequest("AnswerJson cannot be null.");
+            }
+
             await _surveyAnswerService.AddAsync(surveyAnswer);
 
             return Ok();
         }
 
-        // [HttpGet("{id}/analytics")]
-        // [Authorize(Roles = "Преподаватель")]
-        // public async Task<ActionResult<SurveyAnalyticsDto>> GetSurveyAnalytics(int id)
-        // {
-        //     var survey = await _surveyService.GetByIdAsync(id);
-        //     if (survey == null)
-        //     {
-        //         return NotFound($"Survey with ID {id} not found.");
-        //     }
+        [HttpGet("{id}/analytics")]
+        [Authorize(Roles = "Преподаватель")]
+        public async Task<ActionResult<SurveyAnalyticsDto>> GetSurveyAnalytics(int id)
+        {
+            var survey = await _surveyService.GetByIdAsync(id);
+            if (survey == null)
+            {
+                return NotFound($"Survey with ID {id} not found.");
+            }
 
-        //     var analytics = await _surveyService.GetAnalyticsAsync(id);
-        //     var analyticsDto = _mapper.Map<SurveyAnalyticsDto>(analytics);
+            var analytics = await _surveyService.GetAnalyticsAsync(id);
+            var analyticsDto = _mapper.Map<SurveyAnalyticsDto>(analytics);
 
-        //     return Ok(analyticsDto);
-        // }
+            return Ok(analyticsDto);
+        }
     }
 }
