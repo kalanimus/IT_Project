@@ -1,0 +1,41 @@
+.survey_list {
+    max-width: 70rem;
+    margin: auto;
+}
+  
+.survey_item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    border-radius: 6px;
+}
+  
+.survey_title {
+    margin: 0 0 4px 0;
+    color: rgba(36, 39, 13, 1);
+}
+  
+.survey_teacher {
+    margin: 0;
+    color: rgba(36, 39, 13, 1);
+  }
+  
+.survey_button {
+    padding: 8px 14px;
+    border: none;
+    color: rgba(251, 255, 227, 1);
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+  
+.survey_button.not_completed {
+    background-color: rgba(251, 255, 227, 1);
+}
+  
+.survey_button.completed {
+    background-color: rgba(251, 255, 227, 1);
+}
+  

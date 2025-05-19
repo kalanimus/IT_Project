@@ -1,0 +1,108 @@
+
+.main_page{
+    display: grid;
+}
+
+.all_block{
+    display: flex;
+    align-items: center; 
+    justify-content: center;
+}
+
+.image{
+    display: inline-block;
+    width: 630px;
+    height: 765px;
+    margin-left: 1rem;
+}
+.right_block{
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    justify-content: center; 
+    text-align: center;
+}
+
+.kalm_text{
+    font-family: "MyFontBold";
+    margin-top: 0px;
+    margin-left: 40px;
+    font-size: 120px;
+    color:  rgba(251, 255, 227, 1);
+    height: 100px;
+    width: 730px;
+}
+.kalm_text2{
+    font-family: "MyFontBold";
+    margin-top: 0;
+    margin-left: 40px;
+    font-size: 20px;
+    color:  rgba(251, 255, 227, 1);
+    height: 20px;
+    width: 730px;
+}
+.kalm_text_information{
+    display: grid;
+    font-family: "MyFontRegular";
+    margin-left: 70px;
+    margin-top: 40px;
+    font-size: 18px;
+    color:  rgba(36, 39, 13, 1);
+    height: 30px;
+    width: 600px;
+    gap: 4px;
+}
+.bold {
+    font-weight: 900;
+    color: rgba(36, 39, 13, 1);
+}
+
+.button1{
+    font-family: "MyFontBold";
+    text-align: center;
+    font-size: 22px;
+    margin-top: 0;
+    margin-bottom: 6px;
+    margin-left: 25px;
+    width: 115px;
+    height: 52px;
+    background-color: rgba(251, 255, 227, 1);
+    border-radius: 30px ;
+    color: rgba(36, 39, 13, 1);
+    border-color: rgba(251, 255, 227, 1);
+    border-style: solid;
+    &:hover{
+        opacity: 0.7;
+    }
+    &:active{
+        opacity: 1.2;
+    }
+}
+.button2{
+    font-family: "MyFontBold";
+    text-align: center;
+    font-size: 22px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+    margin-left: 25px;
+    width: 220px;
+    height: 52px;
+    background-color: rgba(36, 39, 13, 1);
+    border-radius: 30px ;
+    color: rgba(251, 255, 227, 1);
+    border-color: rgba(36, 39, 13, 1) ;
+    border-style: solid;
+
+    &:hover{
+        opacity: 0.7;
+    }
+    &:active{
+        opacity: 1.2;
+        transition: background-color 0.5s;
+    }
+}
+.claster_buttons{
+    flex-direction: row;
+    margin-top: 220px;
+    margin-left: 45px;
+}

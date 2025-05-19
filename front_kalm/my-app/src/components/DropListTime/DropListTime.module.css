@@ -1,0 +1,12 @@
+.list_time{
+    width: 17rem;
+    border-radius: 30px;
+    border-color: rgba(242, 241, 250, 1) ;
+    height: 2.3rem;
+    font-size: 18px ;
+    font-family: "DM Sans", sans-serif;
+    color: rgba(93, 90, 136, 1);
+    padding-left: 1.3rem;
+    margin-left: 1rem;
+    margin-top: 1.25rem;
+}

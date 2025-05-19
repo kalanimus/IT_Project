@@ -20,6 +20,7 @@ public class AppDbContext : DbContext
     public DbSet<ModelPermissionForRole> PermissionsForRoles { get; set; }
     public DbSet<ModelSurvey> Surveys { get; set; }
     public DbSet<ModelSurveyAnswer> SurveyAnswers { get; set; }
+    public DbSet<ModelReview> Reviews { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Настройка связей многие-ко-многим для GroupStudents

@@ -1,0 +1,137 @@
+.page{
+    display: grid;
+}
+.container_registration{
+    display: grid;
+    width: auto;
+    height: auto;
+}
+
+.form{
+    background-color: rgba(251, 255, 227, 1);
+    width: 528px ;
+    height: auto;
+    margin: 2rem auto;
+    margin-top: 111px;
+    border-style: none;
+    border-radius: 25px;
+}
+.head_word{
+    margin: 2.5rem auto;
+    font-family: "MyFontBold";
+    width: 20rem;
+    font-size: 40px;
+    color: rgba(36, 39, 13, 1);
+    margin-top: 20px;
+    margin-left: 130px;
+}
+
+
+.wrapper_inputs{
+    width: auto;
+    margin: 0;
+    height: auto;
+    display: flex;
+    gap: 1rem;
+    padding: 0 2 rem;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 0;
+}
+.input{
+    position: relative;
+    background-color: rgba(255, 255, 255, 1);
+    border-color: rgba(186, 192, 149, 1);
+    border-radius: 30px;
+    border-style: none;
+    outline:none;
+    height: 60px;
+    font-family: "MyFontRegular";
+    font-size: 16px;
+    color: rgba(36, 39, 13, 1);
+    box-sizing: border-box;
+    padding: 1.5rem;
+    width: 400px;
+    margin-top: 0;
+}
+input::placeholder{
+    padding-left: 1.5rem;
+    font-family: "MyFontRegular";
+    color: rgba(36, 39, 13, 0.3);
+    position: relative;
+    z-index: 1;
+    right: 1.5rem;
+}
+p{
+    position: relative;
+    font-family: "MyFontBold";
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(36, 39, 13, 1);
+    margin:0.8rem auto;
+}
+label{
+    margin: 0rem auto;
+}
+
+.button_sent{
+    font-family: "MyFontBold";
+    text-align: center;
+    font-size: 30px;
+    font-weight: 600;
+    margin: 3.8rem auto 2rem;
+    width: 32.25rem;
+    height: 4.2rem;
+    background-color: rgba(36, 39, 13, 1);
+    border-radius: 30px ;
+    color: rgba(255, 255, 255, 1);
+    border-color: rgba(36, 39, 13, 1) ;
+    border-style: solid;
+    &:hover{
+        opacity: 0.7;
+    }
+    &:active{
+        opacity: 1.2;
+    }
+    margin-top: 2rem;
+}
+
+.checkbox{
+    position: relative;
+    background-color: rgba(251, 255, 227, 1);
+    border-radius: 30px;
+    width: 1.75rem;
+    border-radius: 2;
+    border-color: rgba(186, 192, 149, 1);
+    height: 1.75rem;
+    margin-top: 0;
+    margin-bottom: 0;
+
+}
+
+.container_checkbox{
+    display: flex;
+    margin: 0rem;
+    margin-top: 0rem;
+    margin-bottom: 0rem;
+    margin-left: 6rem;
+    margin-right: 6rem;
+    width: 400px;
+}
+
+.info_text{
+    font-family: "MyFontRegular";
+    font-size: 12px;
+    color: rgba(36, 39, 13, 1);
+    width: 28rem ;
+    height: 3.4rem;
+    margin-left: 1rem;
+    font-weight: 500;
+    margin-top: 0.2rem;
+}
+
+.rules_link{
+    color: rgba(60, 49, 219, 1);
+    font-family: "MyFontRegular";
+    font-size: 12px;
+}

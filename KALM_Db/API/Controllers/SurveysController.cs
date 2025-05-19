@@ -157,11 +157,8 @@ namespace API.Controllers
                 await _ratingService.CalculateRatingAsync(surveyAnswerDto);
                 await _surveyAnswerService.AddAsync(surveyAnswer);
                 return Ok("Ответ успешно сохранен и рейтинг обновлен.");
-                
-
             }
-
-
+            
             await _surveyAnswerService.AddAsync(surveyAnswer);
 
             return Ok();

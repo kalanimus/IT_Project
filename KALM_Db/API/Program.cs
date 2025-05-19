@@ -31,6 +31,7 @@ builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
 builder.Services.AddScoped<ISurveyRepository, SurveyRepository>();
 builder.Services.AddScoped<ISurveyAnswerRepository, SurveyAnswerRepository>();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 
 // Регистрация сервисов
 builder.Services.AddScoped<IUserService, UserService>(); // UserService из Application.Services
@@ -51,6 +52,7 @@ builder.Services.AddScoped<ISurveyService, SurveyService>();
 builder.Services.AddScoped<ISurveyAnswerService, SurveyAnswerService>();
 builder.Services.AddScoped<IGroupTeacherService, GroupTeacherService>();
 builder.Services.AddScoped<IRatingService, RatingService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddTransient<Random>();
 
 // Регистрация AutoMapper
@@ -133,7 +135,19 @@ builder.Services.AddSwaggerGen(c =>
     c.IncludeXmlComments(xmlPath);
 });
 
+// builder.Services.AddCors(options =>
+// {
+//     options.AddPolicy("AllowFrontend",
+//         policy => policy
+//             .WithOrigins("http://localhost:3000") // Укажи свой фронтенд-адрес
+//             .AllowAnyMethod()
+//             .AllowAnyHeader()
+//             .AllowCredentials());
+// });
+
 var app = builder.Build();
+
+// app.UseCors("AllowFrontend");
 
 // Настройка middleware
 if (app.Environment.IsDevelopment())

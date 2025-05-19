@@ -1,0 +1,143 @@
+.footer{
+    display: grid;
+    height: 200px;
+    background-color: rgba(186, 192, 149, 1);
+    width: 100%;
+    overflow-x: hidden;
+}
+.container_footer{
+
+    margin-top: 1rem;
+    gap: 2rem; /* регулируй здесь */
+    height: auto;
+    background-color: rgba(186, 192, 149, 1);
+    width: 100%; /* вместо 100rem */
+    padding: 0 2rem; /* немного отступов по бокам */
+    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+}
+
+.list{
+    font-family: "MyFontRegular";
+    list-style: none;
+    padding-left: 0;
+    color: rgba(36, 39, 13, 1);
+    font-size: 12px;
+    margin:0px auto 0px auto;
+    margin-right: 1rem;
+
+    width: auto; /* убери фиксированную ширину */
+    min-width: 10rem; /* при необходимости */
+    margin: 0;
+}
+
+
+.list_1{
+    font-family: "MyFontRegular";
+    list-style: none;
+    padding-left: 0;
+    color: rgba(36, 39, 13, 1);
+    font-size: 12px;
+    margin:0px auto 0px auto;
+    margin-right: 1rem;
+
+    width: auto; /* убери фиксированную ширину */
+    min-width: 10rem; /* при необходимости */
+    margin: 0;
+}
+
+.list_2{
+    font-family: "MyFontRegular";
+    list-style: none;
+    padding-left: 0;
+    color: rgba(36, 39, 13, 1);
+    font-size: 12px;
+    margin:0px auto 0px auto;
+    margin-right: 1rem;
+
+    width: auto; /* убери фиксированную ширину */
+    min-width: 10rem; /* при необходимости */
+    margin: 0;
+}
+
+.list_3{
+    font-family: "MyFontRegular";
+    list-style: none;
+    padding-left: 0;
+    color: rgba(36, 39, 13, 1);
+    font-size: 12px;
+    /* margin:0px auto 0px auto;
+    margin-right: 1rem; */
+    line-height: 150%;
+    
+    width: auto; /* убери фиксированную ширину */
+    min-width: 15rem; /* при необходимости */
+    margin: 0;
+}
+
+.list_4{
+    font-family: "MyFontRegular";
+    list-style: none;
+    padding-left: 0;
+    color: rgba(36, 39, 13, 1);
+    font-size: 12px;
+    margin:0px auto 0px auto;
+    line-height: 150%;
+
+    width: auto; /* убери фиксированную ширину */
+    min-width: 10rem; /* при необходимости */
+    margin: 0;
+    
+}
+
+
+li{
+    margin-top: 14px;
+}
+
+
+h4{
+    font-family: "MyFontRegular";
+    font-weight: bold;
+    color: rgba(36, 39, 13, 1);
+    font-size: 14px;
+    margin:0px auto 0px auto;
+}
+.right_container{
+    display: flex;
+    margin-top: 0.9rem;
+}
+.left_container{
+    display: grid;
+    margin-right: 4.5rem;
+    margin-left: 2rem;
+
+}
+
+a{
+    text-decoration: none;
+    color: rgba(36, 39, 13, 1);
+    font-family: "MyFontRegular";
+}
+.baumanLogo{
+    width: 150px ;
+    height: 150px;
+    margin-left: 0;
+}
+/* .image{
+    width: 1rem;
+    height: 1rem;
+} */
+.copy{
+    font-family: "MyFontRegular";
+    color: rgba(36, 39, 13, 1);
+    font-size: 12px;
+    font-weight: 300;
+    margin-left: 4rem;
+}
+
+.info{
+    display: flex;
+    margin-left: 2rem;
+}

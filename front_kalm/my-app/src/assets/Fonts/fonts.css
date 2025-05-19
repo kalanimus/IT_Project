@@ -1,0 +1,15 @@
+
+  
+  @font-face {
+    font-family: 'MyFontBold';
+    src: url('./ALS_Sector-Bold.otf') format('opentype');
+    font-weight: 900;
+  }
+
+  @font-face {
+    font-family: 'MyFontRegular';
+    src: url('./ALS_Sector-Regular.otf') format('opentype');
+    font-weight: 400;
+  }
+  
+  
