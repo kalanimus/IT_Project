@@ -23,6 +23,24 @@ public class TeachersController : ControllerBase
     _mapper = mapper;
   }
 
+  [HttpGet("/reviews")]
+  public async Task<ActionResult> GetReviews([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+  {
+    if (page < 1) page = 1;
+    if (pageSize < 1) pageSize = 10;
+
+    var (reviews, total) = await _reviewService.GetPagedAsync(page, pageSize);
+    var reviewsDto = _mapper.Map<List<ReviewDto>>(reviews);
+
+    return Ok(new
+    {
+      Reviews = reviewsDto,
+      Total = total,
+      Page = page,
+      PageSize = pageSize
+    });
+  }
+
   [HttpPost("/reviews")]
   public async Task<ActionResult> PostReview([FromBody] ReviewDto reviewDto)
   {
@@ -30,6 +48,6 @@ public class TeachersController : ControllerBase
 
     var review = _mapper.Map<ModelReview>(reviewDto);
     await _reviewService.PostReviewAsync(review, userName);
-    return Ok("Review psoted successfully");
+    return Ok("Review posted successfully");
   }
 }

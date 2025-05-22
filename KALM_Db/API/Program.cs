@@ -53,6 +53,7 @@ builder.Services.AddScoped<ISurveyAnswerService, SurveyAnswerService>();
 builder.Services.AddScoped<IGroupTeacherService, GroupTeacherService>();
 builder.Services.AddScoped<IRatingService, RatingService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IMistralService, MistralService>();
 builder.Services.AddTransient<Random>();
 
 // Регистрация AutoMapper
@@ -135,19 +136,17 @@ builder.Services.AddSwaggerGen(c =>
     c.IncludeXmlComments(xmlPath);
 });
 
-// builder.Services.AddCors(options =>
-// {
-//     options.AddPolicy("AllowFrontend",
-//         policy => policy
-//             .WithOrigins("http://localhost:3000") // Укажи свой фронтенд-адрес
-//             .AllowAnyMethod()
-//             .AllowAnyHeader()
-//             .AllowCredentials());
-// });
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy => policy
+            .AllowAnyOrigin() // Укажи свой фронтенд-адрес
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+});
 
 var app = builder.Build();
 
-// app.UseCors("AllowFrontend");
 
 // Настройка middleware
 if (app.Environment.IsDevelopment())
@@ -178,6 +177,7 @@ app.UseSwaggerUI(c =>
 
 
 app.UseRouting();
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -189,5 +189,5 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllers();
 });
 
-app.Run();
+app.Run("http://0.0.0.0:5113");
 

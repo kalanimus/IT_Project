@@ -77,5 +77,16 @@ namespace Application.Services
       await _reviewRepository.AddAsync(review);
     }
 
+    public async Task<(List<ModelReview> Reviews, int Total)> GetPagedAsync(int page, int pageSize)
+    {
+      var all = await _reviewRepository.GetAllAsync();
+      var total = all.Count;
+      var paged = all
+          .OrderByDescending(r => r.CreatedAt)
+          .Skip((page - 1) * pageSize)
+          .Take(pageSize)
+          .ToList();
+      return (paged, total);
+    }
   }
 }
