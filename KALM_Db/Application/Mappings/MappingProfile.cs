@@ -42,6 +42,9 @@ namespace Application.Mappings
       CreateMap<ModelAnswerParam, QuestionAnswerDto>();
       CreateMap<QuestionAnswerDto, ModelAnswerParam>();
 
+      CreateMap<ModelAnswerParam, QuestionAnalyticsDto>();
+      CreateMap<ModelSurveyAnalytics, SurveyAnalyticsDto>();
+
       CreateMap<ModelReview, ReviewDto>()
       .ForMember(dest => dest.AuthorFullName, opt => opt.MapFrom(src => src.Author.FullName))
       .ForMember(dest => dest.TeacherFullName, opt => opt.MapFrom(src => src.Teacher.FullName));

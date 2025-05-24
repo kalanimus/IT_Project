@@ -48,5 +48,11 @@ namespace Application.Services
 
             await _surveyAnswerRepository.DeleteAsync(surveyAnswer.Id);
         }
+
+        public async Task<bool> IsSurveyCompletedAsync(int id, string teacherFullName, string subject, string userName)
+        {
+            var surveyAnswer = await _surveyAnswerRepository.GetByDetails(id, teacherFullName, subject, userName);
+            return surveyAnswer != null;
+        }
     }
 }

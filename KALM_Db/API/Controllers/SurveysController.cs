@@ -43,6 +43,15 @@ namespace API.Controllers
             var surveys = await _surveyService.GetByUserNameAsync(userName);
 
             var surveysDto = _mapper.Map<List<SurveyDto>>(surveys);
+            if (User.IsInRole("Студент"))
+            {
+                foreach (var s in surveysDto)
+                {
+                    // Устанавливаем статус завершенности опроса
+                    s.IsCompleted = await _surveyAnswerService.IsSurveyCompletedAsync((int)s.Id, s.Author, s.Subject, userName);
+                }
+            }
+
             return Ok(new SurveyResponseDto
             {
                 Surveys = surveysDto,
@@ -139,9 +148,10 @@ namespace API.Controllers
             {
                 return NotFound($"Survey with ID {id} not found.");
             }
-
+            var AuthorUsername = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
             var surveyAnswer = _mapper.Map<ModelSurveyAnswer>(surveyAnswerDto);
             surveyAnswer.SurveyId = id;
+            surveyAnswer.AuthorUsername = AuthorUsername;
 
             if (existingSurvey.IsStandart)
             {
@@ -158,7 +168,7 @@ namespace API.Controllers
                 await _surveyAnswerService.AddAsync(surveyAnswer);
                 return Ok("Ответ успешно сохранен и рейтинг обновлен.");
             }
-            
+
             await _surveyAnswerService.AddAsync(surveyAnswer);
 
             return Ok();

@@ -14,6 +14,7 @@ namespace Application.Services
         private readonly IUserRepository _userRepository;
         private readonly IGroupStudentRepository _groupStudentRepository;
         private readonly IGroupTeacherRepository _groupTeacherRepository;
+        private readonly IMistralService _mistralService;
 
         public SurveyService(
             ISurveyRepository surveyRepository,
@@ -21,7 +22,8 @@ namespace Application.Services
             IUserRepository userRepository,
             IMapper mapper,
             IGroupStudentRepository groupStudentRepository,
-            IGroupTeacherRepository groupTeacherRepository)
+            IGroupTeacherRepository groupTeacherRepository,
+            IMistralService mistralService)
         {
             _surveyRepository = surveyRepository;
             _surveyAnswerRepository = surveyAnswerRepository;
@@ -29,6 +31,7 @@ namespace Application.Services
             _userRepository = userRepository;
             _groupStudentRepository = groupStudentRepository;
             _groupTeacherRepository = groupTeacherRepository;
+            _mistralService = mistralService;
         }
 
         public async Task<ModelSurvey> GetByIdAsync(int id)
@@ -36,7 +39,8 @@ namespace Application.Services
             return await _surveyRepository.GetByIdAsync(id);
         }
 
-        public async Task<List<ModelSurvey>> GetByUserNameAsync(string userName){
+        public async Task<List<ModelSurvey>> GetByUserNameAsync(string userName)
+        {
             var user = await _userRepository.GetByUsernameAsync(userName);
             if (user != null)
             {
@@ -57,7 +61,8 @@ namespace Application.Services
                     }).ToList();
                     surveys.AddRange(await _surveyRepository.GetByGroupAsync(group.GroupId));
                     return surveys;
-                } else if (user.Role.RoleName == "Преподаватель")
+                }
+                else if (user.Role.RoleName == "Преподаватель")
                 {
                     var groups = await _groupTeacherRepository.GetGroupTeachersByIdAsync(user.Id);
 
@@ -69,14 +74,16 @@ namespace Application.Services
                         Description = null,
                         IsStandart = true,
                         Teacher = t,
-                        QuestionsJson = null
+                        QuestionsJson = standartSurvey.QuestionsJson
                     }).ToList();
                     surveys.AddRange(await _surveyRepository.GetByUserNameAsync(userName));
                     return surveys;
-                } else throw new ForbiddenException("Wrong role", "Неверная роль");
-            } else throw new UserNotFoundException();
+                }
+                else throw new ForbiddenException("Wrong role", "Неверная роль");
+            }
+            else throw new UserNotFoundException();
         }
-        
+
 
         public async Task<List<ModelSurvey>> GetAllAsync()
         {
@@ -119,56 +126,149 @@ namespace Application.Services
             var surveyAnswers = _mapper.Map<List<SurveyAnswerDto>>(await _surveyAnswerRepository.GetBySurveyIdAsync(surveyId));
             if (survey.IsStandart)
             {
-                await MakeStandartAnalyticsAsync(surveyAnswers);
+                return await MakeStandartAnalyticsAsync(surveyAnswers, surveyId);
             }
-            return null;
-
-            
+            else
+            {
+                // return MakeCustomAnalytics(surveyAnswers);
+                return null;
+            }
         }
 
-        public async Task<ModelSurveyAnalytics> MakeStandartAnalyticsAsync(List<SurveyAnswerDto> surveyAnswers)
+        // private ModelSurveyAnalytics MakeCustomAnalytics(List<SurveyAnswerDto> surveyAnswers)
+        // {
+        //     var analytics = new ModelSurveyAnalytics
+        //     {
+        //         Params = new List<ModelAnswerParam>()
+        //     };
+
+        //     // Группируем ответы по тексту вопроса
+        //     var questionGroups = surveyAnswers
+        //         .SelectMany(answer => answer.Answers)
+        //         .GroupBy(q => new { q.Question, q.QuestionType }); // Предполагается, что есть QuestionType
+
+        //     foreach (var group in questionGroups)
+        //     {
+        //         var questionText = group.Key.Question;
+        //         var questionType = group.Key.QuestionType?.ToLower();
+
+        //         if (questionType == "single" || questionType == "multiple")
+        //         {
+        //             // Считаем количество каждого варианта ответа
+        //             var answerCounts = group
+        //                 .SelectMany(q =>
+        //                     questionType == "multiple" && q.Answer.Contains(";")
+        //                         ? q.Answer.Split(';', StringSplitOptions.RemoveEmptyEntries)
+        //                         : new[] { q.Answer }
+        //                 )
+        //                 .GroupBy(ans => ans.Trim())
+        //                 .ToDictionary(g => g.Key, g => g.Count());
+
+        //             analytics.Params.Add(new ModelAnswerParam
+        //             {
+        //                 Param = questionText,
+        //                 Count = group.Count(),
+        //                 AnswerCounts = answerCounts
+        //             });
+        //         }
+        //         else if (questionType == "text")
+        //         {
+        //             // Собираем все текстовые ответы
+        //             var textAnswers = group.Select(q => q.Answer).ToList();
+
+        //             analytics.Params.Add(new ModelAnswerParam
+        //             {
+        //                 Param = questionText,
+        //                 Count = textAnswers.Count,
+        //                 TextAnswers = textAnswers
+        //             });
+        //         }
+        //         else
+        //         {
+        //             // Если тип не определён, просто считаем как текстовые
+        //             var textAnswers = group.Select(q => q.Answer).ToList();
+
+        //             analytics.Params.Add(new ModelAnswerParam
+        //             {
+        //                 Param = questionText,
+        //                 Count = textAnswers.Count,
+        //                 TextAnswers = textAnswers
+        //             });
+        //         }
+        //     }
+
+        //     return analytics;
+        // }
+
+        public async Task<ModelSurveyAnalytics> MakeStandartAnalyticsAsync(
+            List<SurveyAnswerDto> surveyAnswers,
+            int surveyId)
         {
             var analytics = new ModelSurveyAnalytics
             {
+                SurveyId = surveyId,
                 Params = new List<ModelAnswerParam>()
             };
 
-            // Группируем ответы по тексту вопроса
             var questionGroups = surveyAnswers
-                .SelectMany(answer => answer.Answers) // Разворачиваем все ответы
-                .GroupBy(question => question.Question); // Группируем по тексту вопроса
+                .SelectMany(answer => answer.Answers)
+                .GroupBy(q => new { q.Question, q.QuestionType });
+
+            List<string> openAnswers = new();
 
             foreach (var group in questionGroups)
             {
-                var questionText = group.Key;
-                var scores = group
-                    .Select(q =>
-                    {
-                        if (int.TryParse(q.Answer, out var score))
-                        {
-                            return score; // Успешно преобразованное значение
-                        }
-                        return (int?)null; // Если преобразование не удалось
-                    })
-                    .Where(score => score.HasValue) // Исключаем некорректные значения
-                    .Select(score => score.Value) // Преобразуем в int
-                    .ToList();
+                var questionText = group.Key.Question;
+                var questionType = group.Key.QuestionType.ToString();
 
-                // Подсчитываем количество ответов и среднее арифметическое
-                var count = scores.Count;
-                var average = scores.Any() ? scores.Average() : 0;
-
-                // Добавляем данные в аналитику
-                analytics.Params.Add(new ModelAnswerParam
+                if (questionType == "single_choice")
                 {
-                    Param = questionText,
-                    Count = count,
-                    Average = average
-                });
+                    var scores = group
+                        .Select(q => int.TryParse(q.Answer, out var score) ? (int?)score : null)
+                        .Where(score => score.HasValue)
+                        .Select(score => score.Value)
+                        .ToList();
+
+                    analytics.Params.Add(new ModelAnswerParam
+                    {
+                        Param = questionText,
+                        QuestionType = questionType,
+                        Count = scores.Count,
+                        Average = scores.Any() ? scores.Average() : 0
+                    });
+                }
+                else if (questionType == "text")
+                {
+                    var textAnswers = group
+                        .Select(q => q.Answer?.Trim())
+                        .Where(a => !string.IsNullOrWhiteSpace(a) && a.Any(char.IsLetter))
+                        .ToList();
+
+                    if (textAnswers.Any())
+                    {
+                        analytics.Params.Add(new ModelAnswerParam
+                        {
+                            Param = questionText,
+                            QuestionType = questionType,
+                            Count = textAnswers.Count,
+                            TextAnswers = textAnswers
+                        });
+                        openAnswers.AddRange(textAnswers);
+                    }
+                }
+            }
+
+            // Генерация общего комментария через Мистраль
+            if (openAnswers.Any())
+            {
+                var prompt = "На основе следующих комментариев студентов составь общий вывод или рекомендацию для преподавателя. Не используй нецензурные выражения. Комментарии:\n";
+                prompt += string.Join("\n- ", openAnswers);
+
+                analytics.GeneralComment = await _mistralService.SendPromptAsync(prompt);
             }
 
             return analytics;
         }
-        
+
     }
 }

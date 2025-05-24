@@ -26,6 +26,15 @@ public class SurveyAnswerRepository : ISurveyAnswerRepository
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 
+    public async Task<ModelSurveyAnswer> GetByDetails(int id, string targetTeacher, string subject, string authorUsername)
+    {
+        return await _context.SurveyAnswers
+            .FirstOrDefaultAsync(p => p.SurveyId == id &&
+                                      p.TargetTeacher == targetTeacher &&
+                                      p.Subject == subject &&
+                                      p.AuthorUsername == authorUsername);
+    }
+
     public async Task<List<ModelSurveyAnswer>> GetAllAsync()
     {
         return await _context.SurveyAnswers

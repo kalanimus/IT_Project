@@ -213,25 +213,25 @@ namespace Infrastructure.Seeders
                             {
                                 new ModelQuestion 
                                 {
-                                    Type = QuestionType.multiple_choice,
+                                    Type = QuestionType.single_choice,
                                     Text = "Ясность требований, предъявляемых к студентам",
                                     Options = ["1", "2", "3", "4", "5", "Затрудняюсь ответить"]
                                 },
                                 new ModelQuestion 
                                 {
-                                    Type = QuestionType.multiple_choice,
+                                    Type = QuestionType.single_choice,
                                     Text = "Ясность и последовательность изложения материала",
                                     Options = ["1", "2", "3", "4", "5", "Затрудняюсь ответить"]
                                 },
                                 new ModelQuestion 
                                 {
-                                    Type = QuestionType.multiple_choice,
+                                    Type = QuestionType.single_choice,
                                     Text = "Контакт преподавателя с аудиторией",
                                     Options = ["1", "2", "3", "4", "5", "Затрудняюсь ответить"]
                                 },
                                 new ModelQuestion 
                                 {
-                                    Type = QuestionType.multiple_choice,
+                                    Type = QuestionType.single_choice,
                                     Text = "Возможность внеаудиторного общения по учебным и научным вопросам",
                                     Options = ["1", "2", "3", "4", "5", "Затрудняюсь ответить"]
                                 }
@@ -244,25 +244,25 @@ namespace Infrastructure.Seeders
                             {
                                 new ModelQuestion 
                                 {
-                                    Type = QuestionType.multiple_choice,
+                                    Type = QuestionType.single_choice,
                                     Text = "Полезность курса для Вашей будущей карьеры",
                                     Options = ["1", "2", "3", "4", "5", "Затрудняюсь ответить"]
                                 },
                                 new ModelQuestion 
                                 {
-                                    Type = QuestionType.multiple_choice,
+                                    Type = QuestionType.single_choice,
                                     Text = "Полезность курса для расширения кругозора и разностороннего развития",
                                     Options = ["1", "2", "3", "4", "5", "Затрудняюсь ответить"]
                                 },
                                 new ModelQuestion 
                                 {
-                                    Type = QuestionType.multiple_choice,
+                                    Type = QuestionType.single_choice,
                                     Text = "Новизна полученных знаний",
                                     Options = ["1", "2", "3", "4", "5", "Затрудняюсь ответить"]
                                 },
                                 new ModelQuestion 
                                 {
-                                    Type = QuestionType.multiple_choice,
+                                    Type = QuestionType.single_choice,
                                     Text = "Сложность курса для успешного прохождения (1 - очень легкий, 5 - очень сложный)",
                                     Options = ["1", "2", "3", "4", "5", "Затрудняюсь ответить"]
                                 }

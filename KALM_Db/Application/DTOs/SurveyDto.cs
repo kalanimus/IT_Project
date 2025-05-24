@@ -9,5 +9,6 @@ public class SurveyDto
     public string Title { get; set; }
     public string Description { get; set; }
     public bool IsStandart { get; set; }
+    public bool ?IsCompleted { get; set; }
     public List<SurveyPartDto> QuestionsJson { get; set; }
 }
