@@ -2,4 +2,7 @@ using Core.Entities;
 
 namespace Core.Interfaces;
 
-public interface IReviewRepository : IRepository<ModelReview> { }
+public interface IReviewRepository : IRepository<ModelReview>
+{
+  Task<ModelReview> GetLatestAsync();
+}

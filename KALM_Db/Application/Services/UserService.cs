@@ -37,6 +37,11 @@ namespace Application.Services
             return await _userRepository.GetByIdAsync(id);
         }
 
+        public async Task<ModelUser> GetByUsernameAsync(string username)
+        {
+            return await _userRepository.GetByUsernameAsync(username);
+        }
+
         public async Task<List<ModelUser>> GetAllAsync()
         {
             return await _userRepository.GetAllAsync();
@@ -92,13 +97,15 @@ namespace Application.Services
                     if (student == null)
                     {
                         string Username = _usernameGeneratorService.GenerateStudentUsername(item.Student.FullName, item.Student.Username.ToLower());
-                        student = new ModelUser {
+                        student = new ModelUser
+                        {
                             FullName = item.Student.FullName,
                             Username = Username,
                             RoleId = 3,
                             Balance = 0,
                             Email = Username + "@student.bmstu.ru",
-                            IsConfirmed = false };
+                            IsConfirmed = false
+                        };
                     }
 
                     if (await _groupStudentRepository.GetByIdsAsync(group.Id, student.Id) == null)
@@ -118,6 +125,19 @@ namespace Application.Services
             {
                 throw new Exception(ex.Message);
             }
+        }
+        public async Task<(List<ModelUser> Teachers, int Total)> GetPagedTeachersAsync(int page, int pageSize)
+        {
+            var query = await _userRepository.GetTeachersAsync();
+            var total = query.Count();
+
+            var teachers = query
+                .OrderBy(u => u.FullName)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return (teachers, total);
         }
     }
 }

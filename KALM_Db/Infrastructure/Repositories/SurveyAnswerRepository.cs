@@ -35,6 +35,16 @@ public class SurveyAnswerRepository : ISurveyAnswerRepository
                                       p.AuthorUsername == authorUsername);
     }
 
+    public async Task<List<ModelSurveyAnswer>> GetBySurveyDetailsAsync(int surveyId, string subject, string targetTeacher, string group)
+{
+    return await _context.SurveyAnswers
+        .Where(p => p.SurveyId == surveyId &&
+                    p.Subject == subject &&
+                    p.TargetTeacher == targetTeacher &&
+                    p.Group == group)
+        .ToListAsync();
+}
+
     public async Task<List<ModelSurveyAnswer>> GetAllAsync()
     {
         return await _context.SurveyAnswers

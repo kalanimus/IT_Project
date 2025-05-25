@@ -2,6 +2,7 @@ using Core.Entities;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Infrastructure.Repositories;
 
@@ -48,5 +49,14 @@ public class ReviewRepository : IReviewRepository
             _context.Reviews.Remove(Review);
             await _context.SaveChangesAsync();
         }
+    }
+
+    public async Task<ModelReview> GetLatestAsync()
+    {
+        return await _context.Reviews
+            .Include(g => g.Teacher)
+            .Include(g => g.Author)
+            .OrderByDescending(g => g.CreatedAt)
+            .FirstOrDefaultAsync();
     }
 }

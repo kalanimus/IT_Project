@@ -1,15 +1,23 @@
 using Core.Entities;
 using Core.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace Application.Services
 {
     public class SurveyAnswerService : ISurveyAnswerService
     {
         private readonly ISurveyAnswerRepository _surveyAnswerRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly int _surveyAnswerPrice;
 
-        public SurveyAnswerService(ISurveyAnswerRepository surveyAnswerRepository)
+        public SurveyAnswerService(
+            ISurveyAnswerRepository surveyAnswerRepository,
+            IUserRepository userRepository,
+            IConfiguration configuration)
         {
             _surveyAnswerRepository = surveyAnswerRepository;
+            _userRepository = userRepository;
+            _surveyAnswerPrice = configuration.GetValue<int>("Constants:SurveyAnswerPrice");
         }
 
         public async Task<ModelSurveyAnswer> GetByIdAsync(int id)
@@ -25,6 +33,9 @@ namespace Application.Services
         public async Task AddAsync(ModelSurveyAnswer surveyAnswer)
         {
             await _surveyAnswerRepository.AddAsync(surveyAnswer);
+
+            var author = await _userRepository.GetByUsernameAsync(surveyAnswer.AuthorUsername);
+            
         }
 
         public async Task UpdateAsync(ModelSurveyAnswer surveyAnswer)

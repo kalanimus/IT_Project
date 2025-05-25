@@ -119,86 +119,87 @@ namespace Application.Services
             await _surveyRepository.DeleteAsync(survey.Id);
         }
 
-        public async Task<ModelSurveyAnalytics> GetAnalyticsAsync(int surveyId, string userName)
+        public async Task<ModelSurveyAnalytics> GetAnalyticsAsync(int surveyId, string groupName, string subjectName, string userName)
         {
             var survey = await _surveyRepository.GetByIdAsync(surveyId);
             if (survey == null) throw new Exception("Survey not found");
-            var surveyAnswers = _mapper.Map<List<SurveyAnswerDto>>(await _surveyAnswerRepository.GetBySurveyIdAsync(surveyId));
+            var teacher = await _userRepository.GetByUsernameAsync(userName);
+            var surveyAnswers = _mapper.Map<List<SurveyAnswerDto>>(await _surveyAnswerRepository.GetBySurveyDetailsAsync(surveyId, subjectName, teacher.FullName, groupName));
             if (survey.IsStandart)
             {
                 return await MakeStandartAnalyticsAsync(surveyAnswers, surveyId);
             }
             else
             {
-                // return MakeCustomAnalytics(surveyAnswers);
+                return MakeCustomAnalytics(surveyAnswers);
                 return null;
             }
         }
 
-        // private ModelSurveyAnalytics MakeCustomAnalytics(List<SurveyAnswerDto> surveyAnswers)
-        // {
-        //     var analytics = new ModelSurveyAnalytics
-        //     {
-        //         Params = new List<ModelAnswerParam>()
-        //     };
+        private ModelSurveyAnalytics MakeCustomAnalytics(List<SurveyAnswerDto> surveyAnswers)
+        {
+            var analytics = new ModelSurveyAnalytics
+            {
+                Params = new List<ModelAnswerParam>()
+            };
 
-        //     // Группируем ответы по тексту вопроса
-        //     var questionGroups = surveyAnswers
-        //         .SelectMany(answer => answer.Answers)
-        //         .GroupBy(q => new { q.Question, q.QuestionType }); // Предполагается, что есть QuestionType
+            // Группируем ответы по тексту вопроса
+            var questionGroups = surveyAnswers
+                .SelectMany(answer => answer.Answers)
+                .GroupBy(q => new { q.Question, q.QuestionType }); // Предполагается, что есть QuestionType
 
-        //     foreach (var group in questionGroups)
-        //     {
-        //         var questionText = group.Key.Question;
-        //         var questionType = group.Key.QuestionType?.ToLower();
+            foreach (var group in questionGroups)
+            {
+                var questionText = group.Key.Question;
+                var questionType = group.Key.QuestionType?.ToLower();
 
-        //         if (questionType == "single" || questionType == "multiple")
-        //         {
-        //             // Считаем количество каждого варианта ответа
-        //             var answerCounts = group
-        //                 .SelectMany(q =>
-        //                     questionType == "multiple" && q.Answer.Contains(";")
-        //                         ? q.Answer.Split(';', StringSplitOptions.RemoveEmptyEntries)
-        //                         : new[] { q.Answer }
-        //                 )
-        //                 .GroupBy(ans => ans.Trim())
-        //                 .ToDictionary(g => g.Key, g => g.Count());
+                if (questionType == "single_choice" || questionType == "multiple_choice")
+                {
+                    // Считаем количество каждого варианта ответа
+                    var answerCounts = group
+                        .SelectMany(q =>
+                            questionType == "multiple_choice" && q.Answer.Contains(";")
+                                ? q.Answer.Split(';', StringSplitOptions.RemoveEmptyEntries)
+                                : new[] { q.Answer }
+                        )
+                        .GroupBy(ans => ans.Trim())
+                        .ToDictionary(g => g.Key, g => g.Count());
 
-        //             analytics.Params.Add(new ModelAnswerParam
-        //             {
-        //                 Param = questionText,
-        //                 Count = group.Count(),
-        //                 AnswerCounts = answerCounts
-        //             });
-        //         }
-        //         else if (questionType == "text")
-        //         {
-        //             // Собираем все текстовые ответы
-        //             var textAnswers = group.Select(q => q.Answer).ToList();
+                    analytics.Params.Add(new ModelAnswerParam
+                    {
+                        Param = questionText,
+                        Count = group.Count(),
+                        AnswerCounts = answerCounts
+                    });
+                }
+                else if (questionType == "text")
+                {
+                    // Собираем все текстовые ответы
+                    var textAnswers = group.Select(q => q.Answer).ToList();
 
-        //             analytics.Params.Add(new ModelAnswerParam
-        //             {
-        //                 Param = questionText,
-        //                 Count = textAnswers.Count,
-        //                 TextAnswers = textAnswers
-        //             });
-        //         }
-        //         else
-        //         {
-        //             // Если тип не определён, просто считаем как текстовые
-        //             var textAnswers = group.Select(q => q.Answer).ToList();
+                    analytics.Params.Add(new ModelAnswerParam
+                    {
+                        Param = questionText,
+                        Count = textAnswers.Count,
+                        TextAnswers = textAnswers
+                    });
+                }
+                else
+                {
+                    // Если тип не определён, просто считаем как текстовые
+                    var textAnswers = group.Select(q => q.Answer).ToList();
 
-        //             analytics.Params.Add(new ModelAnswerParam
-        //             {
-        //                 Param = questionText,
-        //                 Count = textAnswers.Count,
-        //                 TextAnswers = textAnswers
-        //             });
-        //         }
-        //     }
+                    analytics.Params.Add(new ModelAnswerParam
+                    {
+                        Param = questionText,
+                        Count = textAnswers.Count,
+                        TextAnswers = textAnswers
+                    });
+                }
+            }
 
-        //     return analytics;
-        // }
+            return analytics;
+        }
 
         public async Task<ModelSurveyAnalytics> MakeStandartAnalyticsAsync(
             List<SurveyAnswerDto> surveyAnswers,

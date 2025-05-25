@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Core.Interfaces;
 using Application.DTOs;
 using AutoMapper;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -97,6 +98,16 @@ namespace API.Controllers
             {
                 return StatusCode(500, $"Ошибка обработки файла: {ex.Message}");
             }
+        }
+
+        [HttpGet("balance")]
+        public async Task<ActionResult<decimal>> GetUserBalance()
+        {
+
+            var user = await _userService.GetByUsernameAsync(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value);
+            if (user == null) return NotFound("Пользователь не найден");
+
+            return Ok(user.Balance);
         }
     }
 }

@@ -1,5 +1,6 @@
 using Core.Entities;
 using Core.Interfaces;
+using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -9,12 +10,17 @@ namespace Application.Services
   {
     private readonly IReviewRepository _reviewRepository;
     private readonly IUserRepository _userRepository;
+    private readonly int ReviewPrice;
+    private readonly int ActivityRatingReward;
 
     public ReviewService(IReviewRepository reviewRepository,
-          IUserRepository userRepository)
+          IUserRepository userRepository,
+          IConfiguration configuration)
     {
       _reviewRepository = reviewRepository;
       _userRepository = userRepository;
+      ReviewPrice = configuration.GetValue<int>("Constants:ReviewPrice");
+      ActivityRatingReward = configuration.GetValue<int>("Constants:ActivityRating");
     }
 
     public async Task<ModelReview> GetByIdAsync(int id)
@@ -61,10 +67,12 @@ namespace Application.Services
     {
       var teacher = await _userRepository.GetByFullNameAsync(review.Teacher.FullName);
       var author = await _userRepository.GetByUsernameAsync(authorUsername);
-
+      if (author.Balance < ReviewPrice) throw new InsufficientBalanceException();
       if (teacher == null) throw new Exception("Teacher not found");
       teacher.Rating = (teacher.Rating + review.Rating) / 2;
       review.Teacher = teacher;
+      author.Balance -= ReviewPrice;
+      author.ActivityRate += ActivityRatingReward;
 
       if (review.IsAnonymous)
       {
@@ -87,6 +95,37 @@ namespace Application.Services
           .Take(pageSize)
           .ToList();
       return (paged, total);
+    }
+
+    public async Task<ModelReview> GetLatestAsync()
+    {
+      return await _reviewRepository.GetLatestAsync();
+    }
+
+    public async Task LikeReviewAsync(int reviewId, string username)
+    {
+      var review = await _reviewRepository.GetByIdAsync(reviewId);
+      if (review == null) throw new Exception("Review not found");
+
+      if (!review.LikedByUsernames.Contains(username))
+      {
+        review.LikedByUsernames.Add(username);
+        review.DislikedByUsernames.Remove(username); // убираем дизлайк, если был
+        await _reviewRepository.UpdateAsync(review);
+      }
+    }
+
+    public async Task DislikeReviewAsync(int reviewId, string username)
+    {
+      var review = await _reviewRepository.GetByIdAsync(reviewId);
+      if (review == null) throw new Exception("Review not found");
+
+      if (!review.DislikedByUsernames.Contains(username))
+      {
+        review.DislikedByUsernames.Add(username);
+        review.LikedByUsernames.Remove(username); // убираем лайк, если был
+        await _reviewRepository.UpdateAsync(review);
+      }
     }
   }
 }

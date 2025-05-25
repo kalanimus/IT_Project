@@ -174,9 +174,12 @@ namespace API.Controllers
             return Ok();
         }
 
-        [HttpGet("{id}/analytics")]
+        [HttpGet("analytics")]
         [Authorize(Roles = "Преподаватель")]
-        public async Task<ActionResult<SurveyAnalyticsDto>> GetSurveyAnalytics(int id)
+        public async Task<ActionResult<SurveyAnalyticsDto>> GetSurveyAnalytics(
+            [FromQuery] int id,
+            [FromQuery] string group,
+            [FromQuery] string subject)
         {
             var userName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
             var survey = await _surveyService.GetByIdAsync(id);
@@ -185,7 +188,7 @@ namespace API.Controllers
                 return NotFound($"Survey with ID {id} not found.");
             }
 
-            var analytics = await _surveyService.GetAnalyticsAsync(id, userName);
+            var analytics = await _surveyService.GetAnalyticsAsync(id, group, subject, userName);
             var analyticsDto = _mapper.Map<SurveyAnalyticsDto>(analytics);
 
             return Ok(analyticsDto);

@@ -69,5 +69,17 @@ public class AppDbContext : DbContext
             .HasOne(pr => pr.Permission)
             .WithMany(p => p.PermissionsForRoles)
             .HasForeignKey(pr => pr.PermissionId);
+
+        modelBuilder.Entity<ModelReview>()
+            .Property(r => r.LikedByUsernames)
+            .HasConversion(
+                v => string.Join(';', v),
+                v => v.Split(';', StringSplitOptions.RemoveEmptyEntries).ToList());
+
+        modelBuilder.Entity<ModelReview>()
+            .Property(r => r.DislikedByUsernames)
+            .HasConversion(
+                v => string.Join(';', v),
+                v => v.Split(';', StringSplitOptions.RemoveEmptyEntries).ToList());
     }
 }

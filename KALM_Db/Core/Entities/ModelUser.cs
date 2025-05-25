@@ -13,6 +13,7 @@ public class ModelUser
   public int ?VerificationCode { get; set; }
   public bool IsConfirmed { get; set; }
   public int RoleId { get; set; }
+  public DateTime? LastBonusReceived { get; set; }
   public ModelRole Role { get; set; }
   public List<ModelGroupStudent> GroupStudents { get; set; } = new List<ModelGroupStudent>();
   public List<ModelGroupTeacher> GroupTeachers { get; set; } = new List<ModelGroupTeacher>();

@@ -63,5 +63,13 @@ public class UserRepository : IUserRepository
     }
   }
 
+  
+  public async Task<List<ModelUser>> GetTeachersAsync()
+  {
+    return await _context.Users
+    .Include(u => u.Role)
+    .Where(u => u.Role.RoleName == "Преподаватель")
+    .ToListAsync();
+  }
 
 }

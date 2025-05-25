@@ -5,6 +5,7 @@ using Core.Exceptions;
 using System.Security.Cryptography.X509Certificates;
 
 namespace Application.Services;
+
 public class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepo;
@@ -31,6 +32,15 @@ public class AuthService : IAuthService
         else if (user.PasswordHash == null) throw new UnauthorizedException("user_is_not_registred", "Пользователь не зарегистрирован");
         else if (!_hasher.Verify(password, user.PasswordHash)) throw new UnauthorizedException("wrong_passwrod", "Не верный пароль");
 
+        var now = DateTime.UtcNow;
+        if (user.LastBonusReceived == null || (now - user.LastBonusReceived.Value).TotalHours >= 24)
+        {
+            user.Balance += 1;
+            user.LastBonusReceived = now;
+        }
+
+        await _userRepo.UpdateAsync(user);
+
         return _tokenService.GenerateToken(user);
     }
 
@@ -40,11 +50,14 @@ public class AuthService : IAuthService
         if (user == null) throw new ValidationException("user_do_not_exsists", "Пользователя не существует");
         else if (user.PasswordHash != null) throw new ValidationException("user_is_already_registred", "Пользователь уже зарегистрирован");
 
-        if(user.Role.RoleName != "Студент") {
+        if (user.Role.RoleName != "Студент")
+        {
             user.PasswordHash = _hasher.Hash(password);
             await _userRepo.UpdateAsync(user);
             return _tokenService.GenerateToken(user);
-        } else {
+        }
+        else
+        {
             var code = Random.Shared.Next(100000, 999999);
             user.VerificationCode = code;
             await _userRepo.UpdateAsync(user);
@@ -53,7 +66,8 @@ public class AuthService : IAuthService
         }
     }
 
-    public async Task<string> VerifyCodeAsync(string username, string password, int code){
+    public async Task<string> VerifyCodeAsync(string username, string password, int code)
+    {
         var user = await _userRepo.GetByUsernameAsync(username);
         if (user == null) throw new ValidationException("user_do_not_exsists", "Пользователя не существует");
         else if (user.VerificationCode == null) throw new ValidationException("no_code_here", "Код пуст");
@@ -62,7 +76,8 @@ public class AuthService : IAuthService
             user.PasswordHash = _hasher.Hash(password);
             await _userRepo.UpdateAsync(user);
             return _tokenService.GenerateToken(user);
-        } else {throw new ValidationException("invalid code", "Неправильный код");}
+        }
+        else { throw new ValidationException("invalid code", "Неправильный код"); }
     }
 
 }
