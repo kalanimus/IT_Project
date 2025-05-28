@@ -80,4 +80,16 @@ public class AuthService : IAuthService
         else { throw new ValidationException("invalid code", "Неправильный код"); }
     }
 
+    public async Task SendPasswordToEmailAsync(string username)
+    {
+        var user = await _userRepo.GetByUsernameAsync(username);
+        if (user == null) throw new ValidationException("user_do_not_exsists", "Пользователя не существует");
+
+        var newPassword = Random.Shared.Next(100000, 999999).ToString();
+        user.PasswordHash = _hasher.Hash(newPassword);
+        await _userRepo.UpdateAsync(user);
+
+        await _emailSenderService.SendPasswordEmail(user.Email, newPassword);
+    }
+    
 }

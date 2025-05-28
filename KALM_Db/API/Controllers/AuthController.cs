@@ -50,8 +50,10 @@ namespace API.Controllers
         public async Task<ActionResult<AuthResponseDto>> Register([FromBody] RegisterRequestDto request)
         {
             var token = await _authService.RegisterAsync(request.Username, request.Password);
-            if (token == null){
-                return Ok(new AuthResponseDto{
+            if (token == null)
+            {
+                return Ok(new AuthResponseDto
+                {
                     Message = $"Письмо с подтверждением отправлено на почту! ({request.Username}@student.bmstu.ru)",
                     RequireVerification = true
                 });
@@ -88,6 +90,20 @@ namespace API.Controllers
             var user = await _userService.GetByIdAsync(userId);
 
             return _mapper.Map<UserDto>(user);
+        }
+        
+        [AllowAnonymous]
+        [HttpPost("recover-password")]
+        public async Task<IActionResult> RecoverPassword([FromBody] string username)
+        {
+            var user = await _userService.GetByUsernameAsync(username);
+            if (user == null)
+                return NotFound("Пользователь не найден");
+
+            // Отправка письма с новым паролем
+            await _authService.SendPasswordToEmailAsync(user.Username);
+
+            return Ok("Новый пароль отправлен на вашу почту.");
         }
     }
 }
