@@ -58,8 +58,8 @@ namespace Application.Services
             var existingUser = await _userRepository.GetByIdAsync(user.Id);
             if (existingUser == null) throw new Exception("User not found");
 
-            existingUser.FullName = user.FullName;
-            existingUser.RoleId = user.RoleId;
+            existingUser.Email = user.Email != null? user.Email : existingUser.Email;
+            existingUser.PasswordHash =user.PasswordHash != null? _hasher.Hash(user.PasswordHash) : existingUser.PasswordHash;
 
             await _userRepository.UpdateAsync(existingUser);
         }
