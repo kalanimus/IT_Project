@@ -42,7 +42,8 @@ namespace Application.Mappings
       CreateMap<ModelAnswerParam, QuestionAnswerDto>();
       CreateMap<QuestionAnswerDto, ModelAnswerParam>();
 
-      CreateMap<ModelAnswerParam, QuestionAnalyticsDto>();
+      CreateMap<ModelAnswerParam, QuestionAnalyticsDto>()
+      .ForMember(dest => dest.Question, opt => opt.MapFrom(src => src.Param));
       CreateMap<ModelSurveyAnalytics, SurveyAnalyticsDto>();
 
       CreateMap<ModelUser, TeacherDto>().ReverseMap();
