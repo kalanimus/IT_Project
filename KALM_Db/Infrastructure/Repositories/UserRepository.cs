@@ -63,7 +63,6 @@ public class UserRepository : IUserRepository
     }
   }
 
-  
   public async Task<List<ModelUser>> GetTeachersAsync()
   {
     return await _context.Users
@@ -72,4 +71,21 @@ public class UserRepository : IUserRepository
     .ToListAsync();
   }
 
+  public async Task<List<ModelUser>> GetTopRatedTeachersAsync(int count)
+  {
+    return await _context.Users
+        .Where(u => u.RoleId == 4) // 4 — Преподаватель
+        .OrderByDescending(u => u.Rating) // Предполагается, что есть поле Rating
+        .Take(count)
+        .ToListAsync();
+  }
+  
+  public async Task<ModelUser> GetMostActiveStudentAsync()
+{
+    // Предполагается, что у студента RoleId == 3 и есть поле ActivityRating
+    return await _context.Users
+        .Where(u => u.RoleId == 3) // 3 — студент
+        .OrderByDescending(u => u.ActivityRate) // поле активности
+        .FirstOrDefaultAsync();
+}
 }

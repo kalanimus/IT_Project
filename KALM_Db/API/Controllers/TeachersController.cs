@@ -110,12 +110,20 @@ namespace API.Controllers
       {
         Teachers = teachersDto,
         Total = total,
-        // Teachers = null,
-        // Total = 0,
         Page = page,
         PageSize = pageSize
       });
-      return Ok();
+    }
+
+    /// <summary>
+    /// Получить 3-х преподавателей с наивысшим рейтингом.
+    /// </summary>
+    [HttpGet("top-rated")]
+    public async Task<ActionResult<List<TeacherDto>>> GetTopRatedTeachers()
+    {
+      var topTeachers = await _userService.GetTopRatedTeachersAsync(3);
+      var teachersDto = _mapper.Map<List<TeacherDto>>(topTeachers);
+      return Ok(teachersDto);
     }
   }
 }

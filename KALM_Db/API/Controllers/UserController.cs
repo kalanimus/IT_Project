@@ -109,5 +109,18 @@ namespace API.Controllers
 
             return Ok(user.Balance);
         }
+
+        /// <summary>
+        /// Получить самого активного студента по рейтингу активности.
+        /// </summary>
+        [HttpGet("most-active-student")]
+        public async Task<ActionResult<UserDto>> GetMostActiveStudent()
+        {
+            var user = await _userService.GetMostActiveStudentAsync();
+            if (user == null) return NotFound("Студент не найден");
+
+            var userDto = _mapper.Map<UserDto>(user);
+            return Ok(userDto);
+        }
     }
 }

@@ -139,5 +139,15 @@ namespace Application.Services
 
             return (teachers, total);
         }
+
+        public async Task<List<ModelUser>> GetTopRatedTeachersAsync(int count)
+        {
+            return await _userRepository.GetTopRatedTeachersAsync(count);
+        }
+
+        public async Task<ModelUser> GetMostActiveStudentAsync()
+        {
+            return await _userRepository.GetMostActiveStudentAsync();
+        }
     }
 }
