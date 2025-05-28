@@ -142,5 +142,14 @@ namespace Application.Services
         {
             return await _userRepository.GetMostActiveStudentAsync();
         }
+
+        public async Task<double> GetTeachersRatingAsync(string fullName)
+        {
+            var teacher = await _userRepository.GetByFullNameAsync(fullName);
+            if (teacher == null) throw new Exception("Teacher not found");
+
+            return teacher.Rating;
+        }
+        
     }
 }

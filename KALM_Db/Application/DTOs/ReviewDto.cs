@@ -15,8 +15,9 @@ public class ReviewDto
 
 public class PagedReviewsDto
 {
-    public List<ReviewDto> Reviews { get; set; }
-    public int Total { get; set; }
-    public int Page { get; set; }
-    public int PageSize { get; set; }
+  public List<ReviewDto> Reviews { get; set; }
+  public int Total { get; set; }
+  public int Page { get; set; }
+  public int PageSize { get; set; }
+  public double Rating { get; set; }
 }

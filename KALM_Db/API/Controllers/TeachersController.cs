@@ -39,6 +39,7 @@ namespace API.Controllers
 
       var (reviews, total) = await _reviewService.GetPagedByTeacherFullNameAsync(fullName, page, pageSize);
       var reviewsDto = _mapper.Map<List<ReviewDto>>(reviews);
+      var rating = await _userService.GetTeachersRatingAsync(fullName);
 
 
       return Ok(new PagedReviewsDto
@@ -46,7 +47,8 @@ namespace API.Controllers
         Reviews = reviewsDto,
         Total = total,
         Page = page,
-        PageSize = pageSize
+        PageSize = pageSize,
+        Rating = rating
       });
     }
 
