@@ -70,6 +70,8 @@ public class ReviewRepository : IReviewRepository
     var total = await query.CountAsync();
 
     var reviews = await query
+        .Include(r => r.Teacher)
+        .Include(r => r.Author)
         .OrderByDescending(r => r.CreatedAt)
         .Skip((page - 1) * pageSize)
         .Take(pageSize)
