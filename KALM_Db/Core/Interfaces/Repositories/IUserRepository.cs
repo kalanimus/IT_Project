@@ -9,4 +9,6 @@ public interface IUserRepository : IRepository<ModelUser>
   Task<List<ModelUser>> GetTeachersAsync();
   Task<List<ModelUser>> GetTopRatedTeachersAsync(int count);
   Task<ModelUser> GetMostActiveStudentAsync();
+  Task<(List<ModelUser> Teachers, int Total)> GetPagedTeachersAsync(
+    int page, int pageSize, string search, double? minRating, double? maxRating);
 }

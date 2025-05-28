@@ -97,23 +97,27 @@ namespace API.Controllers
     /// Получить список преподавателей с пагинацией.
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<PagedTeachersDto>> GetTeachers([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+public async Task<ActionResult<PagedTeachersDto>> GetTeachers(
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 10,
+    [FromQuery] string search = "",
+    [FromQuery] double? minRating = null,
+    [FromQuery] double? maxRating = null)
+{
+    if (page < 1) page = 1;
+    if (pageSize < 1) pageSize = 10;
+
+    var (teachers, total) = await _userService.GetPagedTeachersAsync(page, pageSize, search, minRating, maxRating);
+    var teachersDto = _mapper.Map<List<TeacherDto>>(teachers);
+
+    return Ok(new PagedTeachersDto
     {
-      if (page < 1) page = 1;
-      if (pageSize < 1) pageSize = 10;
-
-      // Получаем пользователей с ролью "Преподаватель"
-      var (teachers, total) = await _userService.GetPagedTeachersAsync(page, pageSize);
-      var teachersDto = _mapper.Map<List<TeacherDto>>(teachers);
-
-      return Ok(new PagedTeachersDto
-      {
         Teachers = teachersDto,
         Total = total,
         Page = page,
         PageSize = pageSize
-      });
-    }
+    });
+}
 
     /// <summary>
     /// Получить 3-х преподавателей с наивысшим рейтингом.

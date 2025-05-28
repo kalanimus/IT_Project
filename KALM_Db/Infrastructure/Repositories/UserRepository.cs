@@ -79,13 +79,42 @@ public class UserRepository : IUserRepository
         .Take(count)
         .ToListAsync();
   }
-  
+
   public async Task<ModelUser> GetMostActiveStudentAsync()
-{
+  {
     // Предполагается, что у студента RoleId == 3 и есть поле ActivityRating
     return await _context.Users
         .Where(u => u.RoleId == 3) // 3 — студент
         .OrderByDescending(u => u.ActivityRate) // поле активности
         .FirstOrDefaultAsync();
+  }
+
+  public async Task<(List<ModelUser> Teachers, int Total)> GetPagedTeachersAsync(
+    int page, int pageSize, string search, double? minRating, double? maxRating)
+{
+    var query = _context.Users.AsQueryable();
+
+    // Только преподаватели
+    query = query.Where(u => u.RoleId == 4);
+
+    // Поиск по имени/фамилии
+    if (!string.IsNullOrWhiteSpace(search))
+        query = query.Where(u => u.FullName.Contains(search));
+
+    // Фильтр по рейтингу
+    if (minRating.HasValue)
+        query = query.Where(u => u.Rating >= minRating.Value);
+    if (maxRating.HasValue)
+        query = query.Where(u => u.Rating <= maxRating.Value);
+
+    var total = await query.CountAsync();
+
+    var teachers = await query
+        .OrderByDescending(u => u.Rating)
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize)
+        .ToListAsync();
+
+    return (teachers, total);
 }
 }

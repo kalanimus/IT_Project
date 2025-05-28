@@ -58,8 +58,8 @@ namespace Application.Services
             var existingUser = await _userRepository.GetByIdAsync(user.Id);
             if (existingUser == null) throw new Exception("User not found");
 
-            existingUser.Email = user.Email != null? user.Email : existingUser.Email;
-            existingUser.PasswordHash =user.PasswordHash != null? _hasher.Hash(user.PasswordHash) : existingUser.PasswordHash;
+            existingUser.Email = user.Email != null ? user.Email : existingUser.Email;
+            existingUser.PasswordHash = user.PasswordHash != null ? _hasher.Hash(user.PasswordHash) : existingUser.PasswordHash;
 
             await _userRepository.UpdateAsync(existingUser);
         }
@@ -126,18 +126,10 @@ namespace Application.Services
                 throw new Exception(ex.Message);
             }
         }
-        public async Task<(List<ModelUser> Teachers, int Total)> GetPagedTeachersAsync(int page, int pageSize)
+        public async Task<(List<ModelUser> Teachers, int Total)> GetPagedTeachersAsync(
+    int page, int pageSize, string search, double? minRating, double? maxRating)
         {
-            var query = await _userRepository.GetTeachersAsync();
-            var total = query.Count();
-
-            var teachers = query
-                .OrderBy(u => u.FullName)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
-
-            return (teachers, total);
+            return await _userRepository.GetPagedTeachersAsync(page, pageSize, search, minRating, maxRating);
         }
 
         public async Task<List<ModelUser>> GetTopRatedTeachersAsync(int count)
