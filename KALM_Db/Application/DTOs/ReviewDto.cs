@@ -2,6 +2,7 @@ namespace Application.DTOs;
 
 public class ReviewDto
 {
+  public int Id { get; set; }
   public string TeacherFullName { get; set; }
   public string? AuthorFullName { get; set; }
   public int Rating { get; set; }

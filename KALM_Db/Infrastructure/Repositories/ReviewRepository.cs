@@ -59,4 +59,22 @@ public class ReviewRepository : IReviewRepository
             .OrderByDescending(g => g.CreatedAt)
             .FirstOrDefaultAsync();
     }
+
+    public async Task<(List<ModelReview> Reviews, int Total)> GetPagedByTeacherFullNameAsync(string fullName, int page, int pageSize)
+{
+    // Предполагается, что у ModelReview есть навигационное свойство Teacher (ModelUser)
+    // и у ModelUser есть FirstName и LastName
+    var query = _context.Reviews
+        .Where(r => (r.Teacher.FullName) == fullName);
+
+    var total = await query.CountAsync();
+
+    var reviews = await query
+        .OrderByDescending(r => r.CreatedAt)
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize)
+        .ToListAsync();
+
+    return (reviews, total);
+}
 }

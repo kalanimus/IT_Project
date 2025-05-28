@@ -127,5 +127,10 @@ namespace Application.Services
         await _reviewRepository.UpdateAsync(review);
       }
     }
+
+    public async Task<(List<ModelReview> Reviews, int Total)> GetPagedByTeacherFullNameAsync(string fullName, int page, int pageSize)
+    {
+      return await _reviewRepository.GetPagedByTeacherFullNameAsync(fullName, page, pageSize);
+    }
   }
 }

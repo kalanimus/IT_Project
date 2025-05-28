@@ -9,5 +9,6 @@ public interface IReviewService : IService<ModelReview>
   Task<ModelReview> GetLatestAsync();
   Task LikeReviewAsync(int reviewId, string username);
   Task DislikeReviewAsync(int reviewId, string username);
+  Task<(List<ModelReview> Reviews, int Total)> GetPagedByTeacherFullNameAsync(string fullName, int page, int pageSize);
 
 }
