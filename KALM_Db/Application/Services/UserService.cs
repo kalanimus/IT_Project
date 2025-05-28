@@ -60,6 +60,7 @@ namespace Application.Services
 
             existingUser.Email = user.Email != null ? user.Email : existingUser.Email;
             existingUser.PasswordHash = user.PasswordHash != null ? _hasher.Hash(user.PasswordHash) : existingUser.PasswordHash;
+            existingUser.Balance = user.Balance != 0 ? user.Balance : existingUser.Balance;
 
             await _userRepository.UpdateAsync(existingUser);
         }

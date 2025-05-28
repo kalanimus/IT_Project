@@ -111,6 +111,22 @@ namespace API.Controllers
         }
 
         /// <summary>
+        /// Изменить баланс пользователя по его Id.
+        /// </summary>
+        [Authorize(Policy = "AdminOnly")]
+        [HttpPut("{id}/balance")]
+        public async Task<IActionResult> UpdateUserBalance(int id, [FromBody] int newBalance)
+        {
+            var user = await _userService.GetByIdAsync(id);
+            if (user == null) return NotFound("Пользователь не найден");
+
+            user.Balance = newBalance;
+            await _userService.UpdateAsync(user);
+
+            return NoContent();
+        }
+
+        /// <summary>
         /// Получить самого активного студента по рейтингу активности.
         /// </summary>
         [HttpGet("most-active-student")]
