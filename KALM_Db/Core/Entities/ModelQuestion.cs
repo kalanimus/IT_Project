@@ -2,10 +2,12 @@ using System.Text.Json.Serialization;
 
 namespace Core.Entities;
 
-public enum QuestionType{
+public enum QuestionType
+{
   multiple_choice,
   single_choice,
-  text
+  text,
+  rating
 }
 
 public class ModelQuestion
