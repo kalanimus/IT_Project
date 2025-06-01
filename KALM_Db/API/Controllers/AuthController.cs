@@ -94,9 +94,9 @@ namespace API.Controllers
         
         [AllowAnonymous]
         [HttpPost("recover-password")]
-        public async Task<IActionResult> RecoverPassword([FromBody] string username)
+        public async Task<IActionResult> RecoverPassword([FromBody] RecoverPasswordRequestDto request)
         {
-            var user = await _userService.GetByUsernameAsync(username);
+            var user = await _userService.GetByUsernameAsync(request.Username);
             if (user == null)
                 return NotFound("Пользователь не найден");
 
