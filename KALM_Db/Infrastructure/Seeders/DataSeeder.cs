@@ -44,9 +44,9 @@ namespace Infrastructure.Seeders
             {
                 context.Users.AddRange(
                     new ModelUser { FullName = "Администратор", RoleId = 1, Username = "admin", PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin") },
-                    new ModelUser { FullName = "Модератор", RoleId = 2, Username = "moder", PasswordHash = BCrypt.Net.BCrypt.HashPassword("moder")},
-                    new ModelUser { FullName = "ТестУченик", RoleId = 3, Username = "student", PasswordHash = BCrypt.Net.BCrypt.HashPassword("student") },
-                    new ModelUser { FullName = "ТестПрепод", RoleId = 4, Username = "teacher", PasswordHash = BCrypt.Net.BCrypt.HashPassword("teacher") }
+                    new ModelUser { FullName = "Модератор", RoleId = 2, Username = "moder", PasswordHash = BCrypt.Net.BCrypt.HashPassword("moder")}
+                    // new ModelUser { FullName = "ТестУченик", RoleId = 3, Username = "student", PasswordHash = BCrypt.Net.BCrypt.HashPassword("student") },
+                    // new ModelUser { FullName = "ТестПрепод", RoleId = 4, Username = "teacher", PasswordHash = BCrypt.Net.BCrypt.HashPassword("teacher") }
                 );
                 context.SaveChanges();
             }
@@ -239,7 +239,7 @@ namespace Infrastructure.Seeders
                         },
                         new ModelSurveyPart 
                         {
-                            Title = "Оценка круса",
+                            Title = "Оценка курса",
                             Questions = new List<ModelQuestion>
                             {
                                 new ModelQuestion 
