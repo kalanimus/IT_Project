@@ -8,10 +8,17 @@ namespace Application.Services
     public class SubjectService : ISubjectService
     {
         private readonly ISubjectRepository _subjectRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IGroupTeacherRepository _groupTeacherRepository;
 
-        public SubjectService(ISubjectRepository subjectRepository)
+        public SubjectService(
+            ISubjectRepository subjectRepository,
+            IUserRepository userRepository,
+            IGroupTeacherRepository groupTeacherRepository)
         {
             _subjectRepository = subjectRepository;
+            _userRepository = userRepository;
+            _groupTeacherRepository = groupTeacherRepository;
         }
 
         public async Task<ModelSubject> GetByIdAsync(int id)
@@ -47,6 +54,26 @@ namespace Application.Services
             if (subject == null) throw new Exception("Subject not found");
 
             await _subjectRepository.DeleteAsync(subject.Id);
+        }
+        public async Task<List<ModelSubject>> GetSubjectsByTeacherUserNameAsync(string username)
+        {
+            var teacher = await _userRepository.GetByUsernameAsync(username);
+            var groupTeachers = await _groupTeacherRepository.GetGroupTeachersByIdAsync(teacher.Id);
+            if (groupTeachers == null || !groupTeachers.Any())
+            {
+                return new List<ModelSubject>();
+            }
+            var subjects = new List<ModelSubject>();
+            foreach (var groupTeacher in groupTeachers)
+            {
+                var subject = groupTeacher.Subject;
+                if (subject == null)
+                {
+                    continue;
+                }
+                subjects.Add(subject);
+            }
+            return subjects;
         }
     }
 }

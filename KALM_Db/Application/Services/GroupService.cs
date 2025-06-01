@@ -8,15 +8,18 @@ namespace Application.Services
         private readonly IGroupRepository _groupRepository;
         private readonly IGroupStudentRepository _groupStudentRepository;
         private readonly IGroupTeacherRepository _groupTeacherRepository;
+        private readonly IUserRepository _userRepository;
 
         public GroupService(
             IGroupRepository groupRepository,
             IGroupStudentRepository groupStudentRepository,
-            IGroupTeacherRepository groupTeacherRepository)
+            IGroupTeacherRepository groupTeacherRepository,
+            IUserRepository userRepository)
         {
             _groupStudentRepository = groupStudentRepository;
             _groupTeacherRepository = groupTeacherRepository;
             _groupRepository = groupRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<ModelGroup> GetByIdAsync(int id)
@@ -67,6 +70,27 @@ namespace Application.Services
         public async Task AddTeacherToGroupAsync(ModelGroupTeacher groupTeacher)
         {
             await _groupTeacherRepository.AddAsync(groupTeacher);
+        }
+
+        public async Task<List<ModelGroup>> GetGroupByTeacherUserNameAsync(string userName)
+        {
+            var teacher = await _userRepository.GetByUsernameAsync(userName);
+            var groupTeachers = await _groupTeacherRepository.GetGroupTeachersByIdAsync(teacher.Id);
+            if (groupTeachers == null || !groupTeachers.Any())
+            {
+                return new List<ModelGroup>();
+            }
+            var groups = new List<ModelGroup>();
+            foreach (var groupTeacher in groupTeachers)
+            {
+                var group = groupTeacher.Group;
+                if (group == null)
+                {
+                    continue;
+                }
+                groups.Add(group);
+            }
+            return groups;
         }
     }
 }

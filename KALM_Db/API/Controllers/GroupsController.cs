@@ -3,6 +3,8 @@ using AutoMapper;
 using Core.Interfaces;
 using Core.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace API.Controllers;
 
@@ -39,5 +41,33 @@ public class GroupsController : ControllerBase
         groupTeacherDto.GroupId = groupId;
         await _groupService.AddTeacherToGroupAsync(_mapper.Map<ModelGroupTeacher>(groupTeacherDto));
         return Ok("Teacher added to group successfully");
+    }
+
+    [HttpGet]
+    [Authorize(Roles = "Администратор, Преподаватель")]
+    public async Task<ActionResult<IEnumerable<GroupDto>>> GetAllGroups()
+    {
+        var userName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+        var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+        var groups = new List<ModelGroup>();
+        if (userRole == "Преподаватель")
+        {
+            groups = await _groupService.GetGroupByTeacherUserNameAsync(userName);
+            if (groups == null)
+            {
+                return NotFound("Group not found for the teacher");
+            }
+        }
+        else if (userRole == "Администратор")
+        {
+            groups = await _groupService.GetAllAsync();
+            if (groups == null || !groups.Any())
+            {
+                return NotFound("No groups found");
+            }
+        }
+
+        var groupDtos = _mapper.Map<IEnumerable<GroupDto>>(groups);
+        return Ok(groupDtos);
     }
 }
