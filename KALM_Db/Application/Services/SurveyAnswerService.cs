@@ -9,6 +9,7 @@ namespace Application.Services
         private readonly ISurveyAnswerRepository _surveyAnswerRepository;
         private readonly IUserRepository _userRepository;
         private readonly int _surveyAnswerPrice;
+        private readonly int _activityRatingReward;
 
         public SurveyAnswerService(
             ISurveyAnswerRepository surveyAnswerRepository,
@@ -18,6 +19,7 @@ namespace Application.Services
             _surveyAnswerRepository = surveyAnswerRepository;
             _userRepository = userRepository;
             _surveyAnswerPrice = configuration.GetValue<int>("Constants:SurveyAnswerPrice");
+            _activityRatingReward = configuration.GetValue<int>("Constants:ActivityRatingReward");
         }
 
         public async Task<ModelSurveyAnswer> GetByIdAsync(int id)
@@ -35,6 +37,9 @@ namespace Application.Services
             await _surveyAnswerRepository.AddAsync(surveyAnswer);
 
             var author = await _userRepository.GetByUsernameAsync(surveyAnswer.AuthorUsername);
+            author.Balance += _surveyAnswerPrice;
+            author.ActivityRate += _activityRatingReward;
+            await _userRepository.UpdateAsync(author);
             
         }
 

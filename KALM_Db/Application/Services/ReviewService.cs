@@ -69,7 +69,7 @@ namespace Application.Services
       var author = await _userRepository.GetByUsernameAsync(authorUsername);
       if (author.Balance < ReviewPrice) throw new InsufficientBalanceException();
       if (teacher == null) throw new Exception("Teacher not found");
-      teacher.Rating = (teacher.Rating + review.Rating) / 2;
+      teacher.Rating = teacher.Rating == 0? review.Rating :(teacher.Rating + review.Rating) / 2;
       review.Teacher = teacher;
       author.Balance -= ReviewPrice;
       author.ActivityRate += ActivityRatingReward;
