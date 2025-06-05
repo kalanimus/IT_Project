@@ -125,8 +125,8 @@ namespace Application.Services
             if (survey == null) throw new Exception("Survey not found");
             var teacher = await _userRepository.GetByUsernameAsync(userName);
             var asd = await _surveyAnswerRepository.GetBySurveyDetailsAsync(surveyId, subjectName, teacher.FullName, groupName);
-            Console.WriteLine(asd[0].AnswerJson);
             var surveyAnswers = _mapper.Map<List<SurveyAnswerDto>>(asd);
+            Console.WriteLine(surveyAnswers[0].Answers.Count);
             if (survey.IsStandart)
             {
                 return await MakeStandartAnalyticsAsync(surveyAnswers, surveyId);
