@@ -190,6 +190,8 @@ namespace API.Controllers
 
             var analytics = await _surveyService.GetAnalyticsAsync(id, group, subject, userName);
             var analyticsDto = _mapper.Map<SurveyAnalyticsDto>(analytics);
+            Console.WriteLine(analytics);
+            Console.WriteLine(analyticsDto);
 
             return Ok(analyticsDto);
         }
