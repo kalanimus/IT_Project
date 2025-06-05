@@ -152,7 +152,7 @@ namespace Application.Services
                 var questionText = group.Key.Question;
                 var questionType = group.Key.QuestionType?.ToLower();
 
-                if (questionType == "single_choice" || questionType == "multiple_choice")
+                if (questionType == "rating" || questionType == "multiple_choice")
                 {
                     // Считаем количество каждого варианта ответа
                     var answerCounts = group
