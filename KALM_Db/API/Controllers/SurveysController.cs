@@ -187,9 +187,6 @@ namespace API.Controllers
             {
                 return NotFound($"Survey with ID {id} not found.");
             }
-            Console.WriteLine(id);
-            Console.WriteLine(group);
-            Console.WriteLine(subject);
 
             var analytics = await _surveyService.GetAnalyticsAsync(id, group, subject, userName);
             var analyticsDto = _mapper.Map<SurveyAnalyticsDto>(analytics);

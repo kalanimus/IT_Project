@@ -125,6 +125,7 @@ namespace Application.Services
             if (survey == null) throw new Exception("Survey not found");
             var teacher = await _userRepository.GetByUsernameAsync(userName);
             var surveyAnswers = _mapper.Map<List<SurveyAnswerDto>>(await _surveyAnswerRepository.GetBySurveyDetailsAsync(surveyId, subjectName, teacher.FullName, groupName));
+            Console.WriteLine(surveyAnswers.Count);
             if (survey.IsStandart)
             {
                 return await MakeStandartAnalyticsAsync(surveyAnswers, surveyId);
@@ -132,7 +133,6 @@ namespace Application.Services
             else
             {
                 return MakeCustomAnalytics(surveyAnswers);
-                return null;
             }
         }
 
